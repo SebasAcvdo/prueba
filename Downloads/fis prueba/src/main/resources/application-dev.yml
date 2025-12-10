@@ -21,7 +21,7 @@ spring:
       mode: never
 
 jwt:
-  secret: dev-secret-de-32-caracteres-minimo
+  secret: academia-ud-jwt-secret-key-2024-this-is-a-very-long-secure-key-for-hs512-algorithm-minimum-64-characters
   expiration: 86400000
   refresh-expiration: 604800000
 

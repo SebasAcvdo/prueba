@@ -74,6 +74,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(
             Exception ex, WebRequest request) {
+        // Log the full stack trace for debugging
+        System.err.println("========== UNHANDLED EXCEPTION ==========");
+        System.err.println("Exception: " + ex.getClass().getName());
+        System.err.println("Message: " + ex.getMessage());
+        System.err.println("Stack trace:");
+        ex.printStackTrace();
+        System.err.println("=========================================");
+        
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())

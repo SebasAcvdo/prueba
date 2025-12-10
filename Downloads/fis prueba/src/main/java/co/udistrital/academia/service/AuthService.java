@@ -55,7 +55,8 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = tokenProvider.generateToken(authentication);
 
-        return new TokenResponse(jwt, tokenProvider.getJwtExpirationInMs(), usuario.getRol().name());
+        return new TokenResponse(jwt, tokenProvider.getJwtExpirationInMs(), 
+            usuario.getId(), usuario.getNombre(), usuario.getCorreo(), usuario.getRol().name());
     }
 
     @Transactional
@@ -80,6 +81,7 @@ public class AuthService {
         // Generar token JWT
         String jwt = tokenProvider.generateTokenFromUsername(usuario.getCorreo(), usuario.getRol().name());
 
-        return new TokenResponse(jwt, tokenProvider.getJwtExpirationInMs(), usuario.getRol().name());
+        return new TokenResponse(jwt, tokenProvider.getJwtExpirationInMs(),
+            usuario.getId(), usuario.getNombre(), usuario.getCorreo(), usuario.getRol().name());
     }
 }
