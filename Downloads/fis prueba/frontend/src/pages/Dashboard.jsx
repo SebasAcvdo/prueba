@@ -70,6 +70,9 @@ export const Dashboard = () => {
       <div className={styles.quickActions}>
         <h2 className={styles.quickActionsTitle}>Acciones Rápidas</h2>
         <div className={styles.actionButtons}>
+          <Button icon={TbUsers} onClick={() => navigate('/admin/usuarios')}>
+            Gestionar Usuarios
+          </Button>
           <Button icon={TbUserPlus} onClick={() => navigate('/admin/aspirantes')}>
             Gestionar Aspirantes
           </Button>
@@ -81,7 +84,7 @@ export const Dashboard = () => {
             Gestionar Citaciones
           </Button>
           <Button icon={TbPlus} onClick={() => navigate('/admin/grupos')}>
-            Crear Grupo
+            Gestionar Grupos
           </Button>
         </div>
       </div>
@@ -121,8 +124,20 @@ export const Dashboard = () => {
           >
             Gestionar Calificaciones
           </Button>
+          <Button
+            icon={TbSchool}
+            onClick={() => navigate('/profesor/grupos')}
+          >
+            Ver Mis Grupos
+          </Button>
+          <Button icon={TbUsers} onClick={() => navigate('/profesor/listado-estudiantes')}>
+            Listado Estudiantes
+          </Button>
           <Button icon={TbBell} variant="accent" onClick={() => navigate('/profesor/citaciones')}>
             Ver Citaciones
+          </Button>
+          <Button icon={TbFileText} onClick={() => navigate('/profesor/observador')}>
+            Observador
           </Button>
         </div>
       </div>
@@ -165,6 +180,9 @@ export const Dashboard = () => {
           <Button icon={TbBell} variant="accent" onClick={() => navigate('/acudiente/citaciones')}>
             Ver Citaciones
           </Button>
+          <Button icon={TbSchool} onClick={() => navigate('/acudiente/observador')}>
+            Ver Observador
+          </Button>
         </div>
       </div>
     </>
@@ -182,9 +200,19 @@ export const Dashboard = () => {
           </p>
         </div>
 
-        {user?.rol === 'ADMINISTRADOR' && renderAdminDashboard()}
+        {user?.rol === 'ADMIN' && renderAdminDashboard()}
         {user?.rol === 'PROFESOR' && renderProfesorDashboard()}
         {user?.rol === 'ACUDIENTE' && renderAcudienteDashboard()}
+        {user?.rol === 'ASPIRANTE' && (
+          <div className={styles.quickActions}>
+            <h2 className={styles.quickActionsTitle}>Estado de Solicitud</h2>
+            <div className={styles.actionButtons}>
+              <Button icon={TbFileText} onClick={() => navigate('/aspirante/estado')}>
+                Consultar Estado
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );

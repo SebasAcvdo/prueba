@@ -118,6 +118,43 @@ public class CitacionService {
     }
 
     @Transactional(readOnly = true)
+    public List<CitacionResponse> listarCitaciones(String tipo, Long profesorId, Long acudienteId) {
+        List<Citacion> citaciones = citacionRepository.findAll();
+
+        // Filtrar por tipo si se proporciona
+        if (tipo != null && !tipo.isEmpty()) {
+            try {
+                Citacion.TipoCitacion tipoCitacion = Citacion.TipoCitacion.valueOf(tipo.toUpperCase());
+                citaciones = citaciones.stream()
+                    .filter(c -> c.getTipo().equals(tipoCitacion))
+                    .collect(Collectors.toList());
+            } catch (IllegalArgumentException e) {
+                throw new InvalidOperationException("Tipo de citación inválido: " + tipo);
+            }
+        }
+
+        // Filtrar por profesor si se proporciona
+        if (profesorId != null) {
+            citaciones = citaciones.stream()
+                .filter(c -> c.getProfesores().stream()
+                    .anyMatch(p -> p.getId().equals(profesorId)))
+                .collect(Collectors.toList());
+        }
+
+        // Filtrar por acudiente si se proporciona
+        if (acudienteId != null) {
+            citaciones = citaciones.stream()
+                .filter(c -> c.getAcudientes().stream()
+                    .anyMatch(a -> a.getId().equals(acudienteId)))
+                .collect(Collectors.toList());
+        }
+
+        return citaciones.stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
     public Page<CitacionResponse> listarCitacionesPaginadas(Pageable pageable, String tipo, String estado) {
         Page<Citacion> citaciones;
 

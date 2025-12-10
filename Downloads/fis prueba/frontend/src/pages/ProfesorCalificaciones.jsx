@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { Layout } from '../components/common/Layout';
 import styles from './ProfesorCalificaciones.module.css';
 import { Button } from '../components/common/Button';
 import { Spinner } from '../components/common/Spinner';
@@ -164,23 +165,25 @@ export const ProfesorCalificaciones = () => {
     });
     return agrupados;
   };
-
   if (loading) {
     return (
-      <div className={styles.container}>
-        <Spinner />
-      </div>
+      <Layout>
+        <div className={styles.container}>
+          <Spinner />
+        </div>
+      </Layout>
     );
   }
 
   const logrosAgrupados = agruparLogrosPorCategoria();
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1>Gestión de Calificaciones</h1>
-        <p>Registra y actualiza las calificaciones de los estudiantes</p>
-      </div>
+    <Layout>
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1>Gestión de Calificaciones</h1>
+          <p>Registra y actualiza las calificaciones de los estudiantes</p>
+        </div>
 
       {error && <div className={styles.error}>{error}</div>}
       {success && <div className={styles.success}>{success}</div>}
@@ -298,5 +301,6 @@ export const ProfesorCalificaciones = () => {
         </div>
       )}
     </div>
+    </Layout>
   );
 };

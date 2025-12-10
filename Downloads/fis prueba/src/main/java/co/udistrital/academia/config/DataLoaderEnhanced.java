@@ -45,7 +45,8 @@ public class DataLoaderEnhanced {
             AspiranteRepository aspiranteRepository,
             LogroRepository logroRepository,
             CalificacionRepository calificacionRepository,
-            CitacionRepository citacionRepository) {
+            CitacionRepository citacionRepository,
+            ObservacionRepository observacionRepository) {
 
         return args -> {
             logger.info("🚀 Iniciando carga de datos mejorados para FASE 3...");
@@ -266,6 +267,39 @@ public class DataLoaderEnhanced {
             }
             logger.info("✅ 50 citaciones creadas");
 
+            // 10. CREAR 80 OBSERVACIONES (para estudiantes regulares)
+            Observacion.TipoObservacion[] tiposObs = Observacion.TipoObservacion.values();
+            String[] descripciones = {
+                "Muestra excelente comportamiento en clase",
+                "Demuestra liderazgo positivo con sus compañeros",
+                "Requiere refuerzo en seguimiento de instrucciones",
+                "Participación activa y destacada en actividades",
+                "Presenta dificultades para mantener la atención",
+                "Colabora de manera efectiva en trabajos grupales",
+                "Ha mejorado significativamente su desempeño",
+                "Necesita apoyo adicional en convivencia"
+            };
+            
+            int obsCount = 0;
+            for (Estudiante estudiante : estudiantes) {
+                if (obsCount >= 80) break;
+                
+                // 1-2 observaciones por estudiante
+                int cantObs = 1 + random.nextInt(2);
+                for (int i = 0; i < cantObs && obsCount < 80; i++) {
+                    Observacion observacion = Observacion.builder()
+                        .fecha(LocalDate.now().minusDays(random.nextInt(60)))
+                        .descripcion(descripciones[random.nextInt(descripciones.length)])
+                        .tipo(tiposObs[random.nextInt(tiposObs.length)])
+                        .estudiante(estudiante)
+                        .profesor(estudiante.getGrupo().getProfesor())
+                        .build();
+                    observacionRepository.save(observacion);
+                    obsCount++;
+                }
+            }
+            logger.info("✅ " + obsCount + " observaciones creadas");
+
             // RESUMEN FINAL
             logger.info("");
             logger.info("========================================");
@@ -282,6 +316,7 @@ public class DataLoaderEnhanced {
             logger.info("🎯 Logros: " + logroRepository.count());
             logger.info("📊 Calificaciones: " + calificacionRepository.count());
             logger.info("📅 Citaciones: " + citacionRepository.count());
+            logger.info("📋 Observaciones: " + observacionRepository.count());
             logger.info("========================================");
             logger.info("🔑 Credenciales de Prueba:");
             logger.info("   Admin: admin@academia.ud / Admin123*");

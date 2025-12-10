@@ -49,6 +49,15 @@ public class GrupoService {
         return grupo;
     }
 
+    public List<Grupo> listarGrupos(Long profesorId) {
+        if (profesorId != null) {
+            return grupoRepository.findAll().stream()
+                .filter(g -> g.getProfesor() != null && g.getProfesor().getId().equals(profesorId))
+                .toList();
+        }
+        return grupoRepository.findAll();
+    }
+
     @Transactional
     public Grupo confirmarGrupo(Long id) {
         Grupo grupo = grupoRepository.findById(id)

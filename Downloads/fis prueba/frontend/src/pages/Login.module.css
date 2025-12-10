@@ -79,6 +79,30 @@
   margin-bottom: 1rem;
 }
 
+.preInscripcion {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.preInscripcion p {
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.linkPreInscripcion {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.linkPreInscripcion:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+
 @media (max-width: 968px) {
   .container {
     flex-direction: column;

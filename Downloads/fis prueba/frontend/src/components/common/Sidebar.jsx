@@ -13,7 +13,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import styles from './Sidebar.module.css';
 
 const menuItems = {
-  ADMINISTRADOR: [
+  ADMIN: [
     { path: '/dashboard', label: 'Inicio', icon: TbHome },
     { path: '/admin/usuarios', label: 'Usuarios', icon: TbUsers },
     { path: '/admin/aspirantes', label: 'Aspirantes', icon: TbUserPlus },

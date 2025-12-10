@@ -52,10 +52,13 @@ public class CitacionController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESOR') or hasRole('ACUDIENTE')")
-    @Operation(summary = "C.U 2, 4, 5 - Listar citaciones por tipo", 
-               description = "Lista citaciones filtradas por tipo: INDIVIDUAL, GRUPAL o ASPIRANTE")
-    public ResponseEntity<List<CitacionResponse>> listarCitaciones(@RequestParam String tipo) {
-        List<CitacionResponse> citaciones = citacionService.listarPorTipo(tipo);
+    @Operation(summary = "C.U 2, 4, 5 - Listar citaciones", 
+               description = "Lista citaciones filtradas por tipo, profesor o acudiente")
+    public ResponseEntity<List<CitacionResponse>> listarCitaciones(
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) Long profesorId,
+            @RequestParam(required = false) Long acudienteId) {
+        List<CitacionResponse> citaciones = citacionService.listarCitaciones(tipo, profesorId, acudienteId);
         return ResponseEntity.ok(citaciones);
     }
 

@@ -81,9 +81,9 @@ public class GrupoController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESOR')")
-    @Operation(summary = "Listar todos los grupos", description = "Obtiene la lista completa de grupos")
-    public ResponseEntity<List<Grupo>> listarGrupos() {
-        List<Grupo> grupos = grupoService.listarGrupos();
+    @Operation(summary = "Listar todos los grupos", description = "Obtiene la lista completa de grupos con filtro opcional por profesor")
+    public ResponseEntity<List<Grupo>> listarGrupos(@RequestParam(required = false) Long profesorId) {
+        List<Grupo> grupos = grupoService.listarGrupos(profesorId);
         return ResponseEntity.ok(grupos);
     }
 

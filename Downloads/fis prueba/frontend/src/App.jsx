@@ -8,9 +8,19 @@ import { FirstLogin } from './pages/FirstLogin';
 import { Dashboard } from './pages/Dashboard';
 import { NotFound } from './components/common/NotFound';
 import { ProfesorCalificaciones } from './pages/ProfesorCalificaciones';
+import { ProfesorGrupos } from './pages/ProfesorGrupos';
+import { ProfesorCitaciones } from './pages/ProfesorCitaciones';
+import { ProfesorListadoEstudiantes } from './pages/ProfesorListadoEstudiantes';
+import { ProfesorObservador } from './pages/ProfesorObservador';
 import { AdminAspirantes } from './pages/AdminAspirantes';
 import { AdminCitaciones } from './pages/AdminCitaciones';
+import { AdminGrupos } from './pages/AdminGrupos';
+import { AdminUsuarios } from './pages/AdminUsuarios';
 import { AcudienteBoletin } from './pages/AcudienteBoletin';
+import { AcudienteCitaciones } from './pages/AcudienteCitaciones';
+import { AcudienteObservador } from './pages/AcudienteObservador';
+import { AspiranteForm } from './pages/AspiranteForm';
+import { AspiranteEstado } from './pages/AspiranteEstado';
 import './styles/index.css';
 
 function App() {
@@ -33,6 +43,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/first-login" element={<FirstLogin />} />
+            <Route path="/pre-inscripcion" element={<AspiranteForm />} />
 
             <Route
               path="/dashboard"
@@ -53,7 +64,52 @@ function App() {
               }
             />
 
+            <Route
+              path="/profesor/grupos"
+              element={
+                <ProtectedRoute allowedRoles={['PROFESOR']}>
+                  <ProfesorGrupos />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/profesor/citaciones"
+              element={
+                <ProtectedRoute allowedRoles={['PROFESOR']}>
+                  <ProfesorCitaciones />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/profesor/listado-estudiantes"
+              element={
+                <ProtectedRoute allowedRoles={['PROFESOR']}>
+                  <ProfesorListadoEstudiantes />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/profesor/observador"
+              element={
+                <ProtectedRoute allowedRoles={['PROFESOR']}>
+                  <ProfesorObservador />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Rutas Admin */}
+            <Route
+              path="/admin/usuarios"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminUsuarios />
+                </ProtectedRoute>
+              }
+            />
+
             <Route
               path="/admin/aspirantes"
               element={
@@ -72,12 +128,49 @@ function App() {
               }
             />
 
+            <Route
+              path="/admin/grupos"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminGrupos />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Rutas Acudiente */}
             <Route
               path="/acudiente/boletin"
               element={
                 <ProtectedRoute allowedRoles={['ACUDIENTE']}>
                   <AcudienteBoletin />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/acudiente/citaciones"
+              element={
+                <ProtectedRoute allowedRoles={['ACUDIENTE']}>
+                  <AcudienteCitaciones />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/acudiente/observador"
+              element={
+                <ProtectedRoute allowedRoles={['ACUDIENTE']}>
+                  <AcudienteObservador />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Rutas Aspirante */}
+            <Route
+              path="/aspirante/estado"
+              element={
+                <ProtectedRoute allowedRoles={['ASPIRANTE']}>
+                  <AspiranteEstado />
                 </ProtectedRoute>
               }
             />

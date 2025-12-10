@@ -90,6 +90,13 @@ export const Login = () => {
               Iniciar Sesión
             </Button>
           </form>
+
+          <div className={styles.preInscripcion}>
+            <p>¿Eres nuevo?</p>
+            <a href="/pre-inscripcion" className={styles.linkPreInscripcion}>
+              Registra tu pre-inscripción aquí
+            </a>
+          </div>
         </div>
       </div>
     </div>

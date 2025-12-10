@@ -1,0 +1,179 @@
+.container {
+  padding: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.header h1 {
+  font-size: 2rem;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+}
+
+.header p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.error {
+  background-color: #fee;
+  color: #c33;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #c33;
+}
+
+.statusCard {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  border-left: 6px solid;
+  margin-bottom: 2rem;
+}
+
+.statusHeader {
+  margin-bottom: 1.5rem;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.5rem 1.5rem;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+}
+
+.statusCard h2 {
+  font-size: 1.75rem;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.entrevistaInfo {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #9c27b0;
+}
+
+.entrevistaInfo h3 {
+  margin-top: 0;
+  color: #9c27b0;
+  font-size: 1.25rem;
+}
+
+.fecha {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0.5rem 0;
+}
+
+.aviso {
+  color: #666;
+  margin: 0;
+  font-style: italic;
+}
+
+.infoCard,
+.estudiantesCard,
+.ayudaCard {
+  background: white;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin-bottom: 2rem;
+}
+
+.infoCard h3,
+.estudiantesCard h3,
+.ayudaCard h3 {
+  margin-top: 0;
+  color: #1a1a1a;
+  font-size: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.infoGrid {
+  display: grid;
+  gap: 1rem;
+}
+
+.infoItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.label {
+  font-weight: 500;
+  color: #495057;
+}
+
+.value {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.estudianteItem {
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 0.75rem;
+}
+
+.estudianteInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.estudianteInfo strong {
+  color: #1a1a1a;
+}
+
+.estudianteInfo span {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.ayudaCard p {
+  margin: 0.5rem 0;
+  color: #495057;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.emptyState h2 {
+  color: #1a1a1a;
+  margin-bottom: 1rem;
+}
+
+.emptyState p {
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}

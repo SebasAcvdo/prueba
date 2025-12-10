@@ -158,3 +158,17 @@ CREATE TABLE boletin_logro (
     CONSTRAINT fk_boletin_logro_boletin FOREIGN KEY (boletin_id) REFERENCES boletin(id),
     CONSTRAINT fk_boletin_logro_logro FOREIGN KEY (logro_id) REFERENCES logro(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Tabla observacion
+CREATE TABLE observacion (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    fecha DATE NOT NULL,
+    descripcion VARCHAR(1000) NOT NULL,
+    tipo ENUM('ACADEMICA', 'DISCIPLINARIA', 'CONVIVENCIA', 'LOGRO_DESTACADO') NOT NULL,
+    estudiante_id BIGINT NOT NULL,
+    profesor_id BIGINT NOT NULL,
+    CONSTRAINT fk_observacion_estudiante FOREIGN KEY (estudiante_id) REFERENCES estudiante(id),
+    CONSTRAINT fk_observacion_profesor FOREIGN KEY (profesor_id) REFERENCES usuario(id),
+    INDEX idx_estudiante_fecha (estudiante_id, fecha),
+    INDEX idx_tipo (tipo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
