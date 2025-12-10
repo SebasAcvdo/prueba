@@ -1,0 +1,142 @@
+package co.udistrital.academia.service;
+
+import co.udistrital.academia.dto.CitacionRequest;
+import co.udistrital.academia.dto.CitacionResponse;
+import co.udistrital.academia.entity.Aspirante;
+import co.udistrital.academia.entity.Citacion;
+import co.udistrital.academia.entity.Usuario;
+import co.udistrital.academia.exception.InvalidOperationException;
+import co.udistrital.academia.exception.ResourceNotFoundException;
+import co.udistrital.academia.repository.AspiranteRepository;
+import co.udistrital.academia.repository.CitacionRepository;
+import co.udistrital.academia.repository.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class CitacionService {
+
+    @Autowired
+    private CitacionRepository citacionRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private AspiranteRepository aspiranteRepository;
+
+    @Transactional
+    public CitacionResponse crearCitacion(CitacionRequest request) {
+        Citacion.TipoCitacion tipo;
+        try {
+            tipo = Citacion.TipoCitacion.valueOf(request.tipo().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidOperationException("Tipo de citación inválido: " + request.tipo());
+        }
+
+        Citacion citacion = Citacion.builder()
+                .tipo(tipo)
+                .fecha(request.fecha())
+                .motivo(request.motivo())
+                .estadoCita(Citacion.EstadoCita.PENDIENTE)
+                .build();
+
+        // Validaciones según tipo
+        switch (tipo) {
+            case INDIVIDUAL:
+                if (request.acudienteIds() == null || request.acudienteIds().size() != 1) {
+                    throw new InvalidOperationException("Citación individual requiere 1 acudiente");
+                }
+                if (request.profesorIds() == null || request.profesorIds().size() != 1) {
+                    throw new InvalidOperationException("Citación individual requiere 1 profesor");
+                }
+                break;
+            case GRUPAL:
+                if (request.acudienteIds() == null || request.acudienteIds().isEmpty()) {
+                    throw new InvalidOperationException("Citación grupal requiere al menos 1 acudiente");
+                }
+                if (request.profesorIds() == null || request.profesorIds().size() != 1) {
+                    throw new InvalidOperationException("Citación grupal requiere 1 profesor");
+                }
+                break;
+            case ASPIRANTE:
+                if (request.aspiranteIds() == null || request.aspiranteIds().size() != 1) {
+                    throw new InvalidOperationException("Citación de aspirante requiere 1 aspirante");
+                }
+                break;
+        }
+
+        // Cargar acudientes
+        if (request.acudienteIds() != null) {
+            for (Long acudienteId : request.acudienteIds()) {
+                Usuario acudiente = usuarioRepository.findById(acudienteId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Acudiente no encontrado: " + acudienteId));
+                citacion.getAcudientes().add(acudiente);
+            }
+        }
+
+        // Cargar profesores
+        if (request.profesorIds() != null) {
+            for (Long profesorId : request.profesorIds()) {
+                Usuario profesor = usuarioRepository.findById(profesorId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Profesor no encontrado: " + profesorId));
+                citacion.getProfesores().add(profesor);
+            }
+        }
+
+        // Cargar aspirantes
+        if (request.aspiranteIds() != null) {
+            for (Long aspiranteId : request.aspiranteIds()) {
+                Aspirante aspirante = aspiranteRepository.findById(aspiranteId)
+                        .orElseThrow(() -> new ResourceNotFoundException("Aspirante no encontrado: " + aspiranteId));
+                citacion.getAspirantes().add(aspirante);
+            }
+        }
+
+        citacion = citacionRepository.save(citacion);
+        return toResponse(citacion);
+    }
+
+    @Transactional(readOnly = true)
+    public List<CitacionResponse> listarPorTipo(String tipo) {
+        Citacion.TipoCitacion tipoCitacion;
+        try {
+            tipoCitacion = Citacion.TipoCitacion.valueOf(tipo.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidOperationException("Tipo de citación inválido: " + tipo);
+        }
+
+        return citacionRepository.findByTipo(tipoCitacion).stream()
+                .map(this::toResponse)
+                .collect(Collectors.toList());
+    }
+
+    private CitacionResponse toResponse(Citacion citacion) {
+        List<String> acudientes = citacion.getAcudientes().stream()
+                .map(Usuario::getNombre)
+                .collect(Collectors.toList());
+
+        List<String> profesores = citacion.getProfesores().stream()
+                .map(Usuario::getNombre)
+                .collect(Collectors.toList());
+
+        List<Long> aspiranteIds = citacion.getAspirantes().stream()
+                .map(Aspirante::getId)
+                .collect(Collectors.toList());
+
+        return new CitacionResponse(
+                citacion.getId(),
+                citacion.getTipo().name(),
+                citacion.getFecha(),
+                citacion.getMotivo(),
+                citacion.getEstadoCita().name(),
+                acudientes,
+                profesores,
+                aspiranteIds
+        );
+    }
+}

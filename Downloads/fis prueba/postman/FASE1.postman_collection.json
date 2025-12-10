@@ -1,0 +1,514 @@
+{
+	"info": {
+		"_postman_id": "fase1-academia-ud",
+		"name": "FASE 1 - Academia UD API",
+		"description": "Colección completa de los 18 casos de uso del sistema académico",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "1. Autenticación",
+			"item": [
+				{
+					"name": "C.U 25 - Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"access_token\", jsonData.accessToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"correo\": \"admin@academia.ud\",\n    \"password\": \"Admin123*\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "login"]
+						}
+					}
+				},
+				{
+					"name": "C.U 26 - First Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"correo\": \"nuevo@academia.ud\",\n    \"passwordTemporal\": \"temp123\",\n    \"nuevaPassword\": \"NuevaPass123*\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/first-login",
+							"host": ["{{base_url}}"],
+							"path": ["api", "auth", "first-login"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Gestión de Usuarios",
+			"item": [
+				{
+					"name": "C.U 17 - Crear Usuario",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Nuevo Profesor\",\n    \"correo\": \"nuevo.profesor@academia.ud\",\n    \"rol\": \"PROFESOR\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/usuarios",
+							"host": ["{{base_url}}"],
+							"path": ["api", "usuarios"]
+						}
+					}
+				},
+				{
+					"name": "C.U 18 - Listar Usuarios",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/usuarios/page?page=0&size=20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "usuarios", "page"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "C.U 17.1 - Actualizar Usuario",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Nombre Actualizado\",\n    \"correo\": \"actualizado@academia.ud\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/usuarios/2",
+							"host": ["{{base_url}}"],
+							"path": ["api", "usuarios", "2"]
+						}
+					}
+				},
+				{
+					"name": "C.U 20 - Deshabilitar Usuario",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/usuarios/2/estado?estado=false",
+							"host": ["{{base_url}}"],
+							"path": ["api", "usuarios", "2", "estado"],
+							"query": [
+								{
+									"key": "estado",
+									"value": "false"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Gestión de Grupos",
+			"item": [
+				{
+					"name": "C.U 32 - Crear Grupo",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Jardín A\",\n    \"grado\": \"Jardín\",\n    \"capacidad\": 20,\n    \"profesorId\": 2\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/grupos",
+							"host": ["{{base_url}}"],
+							"path": ["api", "grupos"]
+						}
+					}
+				},
+				{
+					"name": "C.U 33 - Confirmar Grupo",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/grupos/1/confirmar",
+							"host": ["{{base_url}}"],
+							"path": ["api", "grupos", "1", "confirmar"]
+						}
+					}
+				},
+				{
+					"name": "C.U 34 - Generar Listado PDF",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/grupos/1/listado.pdf",
+							"host": ["{{base_url}}"],
+							"path": ["api", "grupos", "1", "listado.pdf"]
+						}
+					}
+				},
+				{
+					"name": "Listar Grupos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/grupos",
+							"host": ["{{base_url}}"],
+							"path": ["api", "grupos"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "4. Gestión de Aspirantes",
+			"item": [
+				{
+					"name": "C.U 28 - Crear Aspirante",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombreUsuario\": \"Juliana Torres\",\n    \"correo\": \"juliana.torres@correo.com\",\n    \"estudiantes\": [\n        {\n            \"nombre\": \"Carlos\",\n            \"apellido\": \"Torres Ruiz\",\n            \"grado\": \"Párvulos\",\n            \"regCivil\": \"RC-99999\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/aspirantes",
+							"host": ["{{base_url}}"],
+							"path": ["api", "aspirantes"]
+						}
+					}
+				},
+				{
+					"name": "C.U 30 - Cambiar Estado Aspirante",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"estado\": \"REVISADO\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/aspirantes/1/estado",
+							"host": ["{{base_url}}"],
+							"path": ["api", "aspirantes", "1", "estado"]
+						}
+					}
+				},
+				{
+					"name": "C.U 31 - Agendar Entrevista",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/aspirantes/1/entrevista?fecha=2025-12-20",
+							"host": ["{{base_url}}"],
+							"path": ["api", "aspirantes", "1", "entrevista"],
+							"query": [
+								{
+									"key": "fecha",
+									"value": "2025-12-20"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "5. Gestión de Citaciones",
+			"item": [
+				{
+					"name": "C.U 1 - Crear Citación Individual",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"tipo\": \"INDIVIDUAL\",\n    \"fecha\": \"2025-12-15T10:00:00\",\n    \"motivo\": \"Reunión sobre comportamiento\",\n    \"acudienteIds\": [4],\n    \"profesorIds\": [2]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/citaciones",
+							"host": ["{{base_url}}"],
+							"path": ["api", "citaciones"]
+						}
+					}
+				},
+				{
+					"name": "C.U 2 - Listar Citaciones Grupales",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/citaciones?tipo=GRUPAL",
+							"host": ["{{base_url}}"],
+							"path": ["api", "citaciones"],
+							"query": [
+								{
+									"key": "tipo",
+									"value": "GRUPAL"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "C.U 4 - Listar Citaciones Individuales",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/citaciones?tipo=INDIVIDUAL",
+							"host": ["{{base_url}}"],
+							"path": ["api", "citaciones"],
+							"query": [
+								{
+									"key": "tipo",
+									"value": "INDIVIDUAL"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "C.U 5 - Listar Citaciones Aspirantes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/citaciones?tipo=ASPIRANTE",
+							"host": ["{{base_url}}"],
+							"path": ["api", "citaciones"],
+							"query": [
+								{
+									"key": "tipo",
+									"value": "ASPIRANTE"
+								}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "6. Gestión de Logros",
+			"item": [
+				{
+					"name": "Crear Logro",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nombre\": \"Reconoce figuras geométricas\",\n    \"descripcion\": \"Identifica círculo, cuadrado y triángulo\",\n    \"categoria\": \"COGNITIVO_LENGUAJE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/logros",
+							"host": ["{{base_url}}"],
+							"path": ["api", "logros"]
+						}
+					}
+				},
+				{
+					"name": "Listar Logros",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/logros",
+							"host": ["{{base_url}}"],
+							"path": ["api", "logros"]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "7. Gestión de Calificaciones",
+			"item": [
+				{
+					"name": "C.U 9 - Crear Calificación",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"valor\": 4.5,\n    \"periodo\": 1,\n    \"logroId\": 1,\n    \"estudianteId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/calificaciones",
+							"host": ["{{base_url}}"],
+							"path": ["api", "calificaciones"]
+						}
+					}
+				},
+				{
+					"name": "C.U 10 - Modificar Calificación",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"valor\": 4.8,\n    \"periodo\": 1,\n    \"logroId\": 1,\n    \"estudianteId\": 1\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/calificaciones/1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "calificaciones", "1"]
+						}
+					}
+				},
+				{
+					"name": "C.U 7 - Consultar Calificaciones",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/calificaciones?estudianteId=1&periodo=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "calificaciones"],
+							"query": [
+								{
+									"key": "estudianteId",
+									"value": "1"
+								},
+								{
+									"key": "periodo",
+									"value": "1"
+								}
+							]
+						}
+					}
+				},
+				{
+					"name": "C.U 8 - Generar Boletín PDF",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/calificaciones/reporte/boletin?estudianteId=1&periodo=1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "calificaciones", "reporte", "boletin"],
+							"query": [
+								{
+									"key": "estudianteId",
+									"value": "1"
+								},
+								{
+									"key": "periodo",
+									"value": "1"
+								}
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "access_token",
+			"value": ""
+		}
+	]
+}
