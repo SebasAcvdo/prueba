@@ -1,5 +1,6 @@
 package co.udistrital.academia.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,6 +39,7 @@ public class Grupo {
     @JoinColumn(name = "profesor_id")
     private Usuario profesor;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "grupo", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Estudiante> estudiantes = new ArrayList<>();

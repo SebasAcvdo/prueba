@@ -1,7 +1,6 @@
 package co.udistrital.academia.service;
 
 import co.udistrital.academia.dto.LogroRequest;
-import co.udistrital.academia.dto.LogroResponse;
 import co.udistrital.academia.entity.Logro;
 import co.udistrital.academia.exception.InvalidOperationException;
 import co.udistrital.academia.exception.ResourceNotFoundException;
@@ -11,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class LogroService {
@@ -20,7 +18,7 @@ public class LogroService {
     private LogroRepository logroRepository;
 
     @Transactional
-    public LogroResponse crearLogro(LogroRequest request) {
+    public Logro crearLogro(LogroRequest request) {
         Logro.Categoria categoria;
         try {
             categoria = Logro.Categoria.valueOf(request.categoria().toUpperCase());
@@ -35,19 +33,16 @@ public class LogroService {
                 .estado(Logro.EstadoLogro.ACTIVO)
                 .build();
 
-        logro = logroRepository.save(logro);
-        return toResponse(logro);
+        return logroRepository.save(logro);
     }
 
     @Transactional(readOnly = true)
-    public List<LogroResponse> listarLogros() {
-        return logroRepository.findAll().stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+    public List<Logro> listarLogros() {
+        return logroRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public List<LogroResponse> listarPorCategoria(String categoria) {
+    public List<Logro> listarPorCategoria(String categoria) {
         Logro.Categoria cat;
         try {
             cat = Logro.Categoria.valueOf(categoria.toUpperCase());
@@ -55,13 +50,11 @@ public class LogroService {
             throw new InvalidOperationException("Categoría inválida: " + categoria);
         }
 
-        return logroRepository.findByCategoria(cat).stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+        return logroRepository.findByCategoria(cat);
     }
 
     @Transactional
-    public LogroResponse actualizarLogro(Long id, LogroRequest request) {
+    public Logro actualizarLogro(Long id, LogroRequest request) {
         Logro logro = logroRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Logro no encontrado"));
 
@@ -74,8 +67,7 @@ public class LogroService {
             throw new InvalidOperationException("Categoría inválida: " + request.categoria());
         }
 
-        logro = logroRepository.save(logro);
-        return toResponse(logro);
+        return logroRepository.save(logro);
     }
 
     @Transactional
@@ -84,15 +76,5 @@ public class LogroService {
             throw new ResourceNotFoundException("Logro no encontrado");
         }
         logroRepository.deleteById(id);
-    }
-
-    private LogroResponse toResponse(Logro logro) {
-        return new LogroResponse(
-                logro.getId(),
-                logro.getNombre(),
-                logro.getDescripcion(),
-                logro.getCategoria().name(),
-                logro.getEstado().name()
-        );
     }
 }

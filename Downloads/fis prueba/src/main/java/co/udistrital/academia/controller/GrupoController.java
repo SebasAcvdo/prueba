@@ -2,7 +2,7 @@ package co.udistrital.academia.controller;
 
 import co.udistrital.academia.dto.AddEstudianteRequest;
 import co.udistrital.academia.dto.GrupoRequest;
-import co.udistrital.academia.dto.GrupoResponse;
+import co.udistrital.academia.entity.Grupo;
 import co.udistrital.academia.service.GrupoService;
 import co.udistrital.academia.service.ReporteService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,8 +35,8 @@ public class GrupoController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "C.U 32 - Creación de grupos", 
                description = "Crea un nuevo grupo en estado BORRADOR con capacidad máxima 20")
-    public ResponseEntity<GrupoResponse> crearGrupo(@Valid @RequestBody GrupoRequest request) {
-        GrupoResponse response = grupoService.crearGrupo(request);
+    public ResponseEntity<Grupo> crearGrupo(@Valid @RequestBody GrupoRequest request) {
+        Grupo response = grupoService.crearGrupo(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -44,8 +44,8 @@ public class GrupoController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "C.U 33 - Confirmar grupo", 
                description = "Confirma un grupo cambiando su estado de BORRADOR a ACTIVO")
-    public ResponseEntity<GrupoResponse> confirmarGrupo(@PathVariable Long id) {
-        GrupoResponse response = grupoService.confirmarGrupo(id);
+    public ResponseEntity<Grupo> confirmarGrupo(@PathVariable Long id) {
+        Grupo response = grupoService.confirmarGrupo(id);
         return ResponseEntity.ok(response);
     }
 
@@ -66,16 +66,16 @@ public class GrupoController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESOR')")
     @Operation(summary = "Listar todos los grupos", description = "Obtiene la lista completa de grupos")
-    public ResponseEntity<List<GrupoResponse>> listarGrupos() {
-        List<GrupoResponse> grupos = grupoService.listarGrupos();
+    public ResponseEntity<List<Grupo>> listarGrupos() {
+        List<Grupo> grupos = grupoService.listarGrupos();
         return ResponseEntity.ok(grupos);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESOR')")
     @Operation(summary = "Obtener grupo por ID", description = "Obtiene los detalles de un grupo específico")
-    public ResponseEntity<GrupoResponse> obtenerGrupo(@PathVariable Long id) {
-        GrupoResponse response = grupoService.obtenerGrupo(id);
+    public ResponseEntity<Grupo> obtenerGrupo(@PathVariable Long id) {
+        Grupo response = grupoService.obtenerGrupo(id);
         return ResponseEntity.ok(response);
     }
 }

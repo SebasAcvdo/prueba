@@ -1,9 +1,6 @@
 package co.udistrital.academia.service;
 
 import co.udistrital.academia.dto.AspiranteCreateRequest;
-import co.udistrital.academia.dto.AspiranteResponse;
-import co.udistrital.academia.dto.EstudianteSimpleResponse;
-import co.udistrital.academia.dto.UsuarioResponse;
 import co.udistrital.academia.entity.Aspirante;
 import co.udistrital.academia.entity.Estudiante;
 import co.udistrital.academia.entity.Usuario;
@@ -17,9 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class AspiranteService {
@@ -34,7 +29,7 @@ public class AspiranteService {
     private PasswordEncoder passwordEncoder;
 
     @Transactional
-    public AspiranteResponse crearAspirante(AspiranteCreateRequest request) {
+    public Aspirante crearAspirante(AspiranteCreateRequest request) {
         if (request.estudiantes() == null || request.estudiantes().isEmpty()) {
             throw new InvalidOperationException("Debe incluir al menos un estudiante");
         }
@@ -75,12 +70,11 @@ public class AspiranteService {
             aspirante.getEstudiantes().add(estudiante);
         }
 
-        aspirante = aspiranteRepository.save(aspirante);
-        return toResponse(aspirante);
+        return aspiranteRepository.save(aspirante);
     }
 
     @Transactional
-    public AspiranteResponse cambiarEstado(Long id, String nuevoEstado) {
+    public Aspirante cambiarEstado(Long id, String nuevoEstado) {
         Aspirante aspirante = aspiranteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Aspirante no encontrado"));
 
@@ -91,44 +85,17 @@ public class AspiranteService {
             throw new InvalidOperationException("Estado inválido: " + nuevoEstado);
         }
 
-        aspirante = aspiranteRepository.save(aspirante);
-        return toResponse(aspirante);
+        return aspiranteRepository.save(aspirante);
     }
 
     @Transactional
-    public AspiranteResponse agendarEntrevista(Long id, LocalDate fecha) {
+    public Aspirante agendarEntrevista(Long id, LocalDate fecha) {
         Aspirante aspirante = aspiranteRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Aspirante no encontrado"));
 
         aspirante.setEstadoInscripcion(Aspirante.EstadoInscripcion.ESPERA_ENTREVISTA);
         aspirante.setFechaEntrevista(fecha);
 
-        aspirante = aspiranteRepository.save(aspirante);
-        return toResponse(aspirante);
-    }
-
-    private AspiranteResponse toResponse(Aspirante aspirante) {
-        UsuarioResponse usuarioResponse = new UsuarioResponse(
-                aspirante.getUsuario().getId(),
-                aspirante.getUsuario().getNombre(),
-                aspirante.getUsuario().getCorreo(),
-                aspirante.getUsuario().getRol().name(),
-                aspirante.getUsuario().getEstado(),
-                null, null
-        );
-
-        List<EstudianteSimpleResponse> estudiantes = aspirante.getEstudiantes().stream()
-                .map(e -> new EstudianteSimpleResponse(
-                        e.getId(), e.getNombre(), e.getApellido(), e.getGrado(),
-                        e.getRegCivil(), e.getEstado().name()))
-                .collect(Collectors.toList());
-
-        return new AspiranteResponse(
-                aspirante.getId(),
-                aspirante.getEstadoInscripcion().name(),
-                aspirante.getFechaEntrevista(),
-                usuarioResponse,
-                estudiantes
-        );
+        return aspiranteRepository.save(aspirante);
     }
 }

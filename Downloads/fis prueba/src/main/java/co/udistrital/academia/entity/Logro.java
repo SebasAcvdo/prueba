@@ -1,5 +1,6 @@
 package co.udistrital.academia.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,10 +35,12 @@ public class Logro {
     @Builder.Default
     private EstadoLogro estado = EstadoLogro.ACTIVO;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "logro", cascade = CascadeType.ALL)
     @Builder.Default
     private List<Calificacion> calificaciones = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "logros")
     @Builder.Default
     private List<Boletin> boletines = new ArrayList<>();

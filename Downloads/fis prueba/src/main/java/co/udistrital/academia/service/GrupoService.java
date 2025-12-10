@@ -1,8 +1,6 @@
 package co.udistrital.academia.service;
 
-import co.udistrital.academia.dto.EstudianteSimpleResponse;
 import co.udistrital.academia.dto.GrupoRequest;
-import co.udistrital.academia.dto.GrupoResponse;
 import co.udistrital.academia.entity.Estudiante;
 import co.udistrital.academia.entity.Grupo;
 import co.udistrital.academia.entity.Usuario;
@@ -16,8 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 public class GrupoService {
 
@@ -31,7 +27,7 @@ public class GrupoService {
     private EstudianteRepository estudianteRepository;
 
     @Transactional
-    public GrupoResponse crearGrupo(GrupoRequest request) {
+    public Grupo crearGrupo(GrupoRequest request) {
         Usuario profesor = usuarioRepository.findById(request.profesorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Profesor no encontrado"));
 
@@ -48,11 +44,11 @@ public class GrupoService {
                 .build();
 
         grupo = grupoRepository.save(grupo);
-        return toResponse(grupo);
+        return grupo;
     }
 
     @Transactional
-    public GrupoResponse confirmarGrupo(Long id) {
+    public Grupo confirmarGrupo(Long id) {
         Grupo grupo = grupoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Grupo no encontrado"));
 
@@ -61,26 +57,22 @@ public class GrupoService {
         }
 
         grupo.setEstado(Grupo.EstadoGrupo.ACTIVO);
-        grupo = grupoRepository.save(grupo);
-        return toResponse(grupo);
+        return grupoRepository.save(grupo);
     }
 
     @Transactional(readOnly = true)
-    public List<GrupoResponse> listarGrupos() {
-        return grupoRepository.findAll().stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+    public List<Grupo> listarGrupos() {
+        return grupoRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public GrupoResponse obtenerGrupo(Long id) {
-        Grupo grupo = grupoRepository.findById(id)
+    public Grupo obtenerGrupo(Long id) {
+        return grupoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Grupo no encontrado"));
-        return toResponse(grupo);
     }
 
     @Transactional
-    public GrupoResponse agregarEstudiante(Long grupoId, Long estudianteId) {
+    public Grupo agregarEstudiante(Long grupoId, Long estudianteId) {
         Grupo grupo = grupoRepository.findById(grupoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Grupo no encontrado"));
 
@@ -98,25 +90,7 @@ public class GrupoService {
         estudiante.setGrupo(grupo);
         estudianteRepository.save(estudiante);
 
-        return toResponse(grupo);
-    }
-
-    private GrupoResponse toResponse(Grupo grupo) {
-        List<EstudianteSimpleResponse> estudiantes = grupo.getEstudiantes().stream()
-                .map(e -> new EstudianteSimpleResponse(
-                        e.getId(), e.getNombre(), e.getApellido(), e.getGrado(),
-                        e.getRegCivil(), e.getEstado().name()))
-                .collect(Collectors.toList());
-
-        return new GrupoResponse(
-                grupo.getId(),
-                grupo.getNombre(),
-                grupo.getGrado(),
-                grupo.getCapacidad(),
-                grupo.getEstado().name(),
-                grupo.getProfesor().getNombre(),
-                grupo.getEstudiantes().size(),
-                estudiantes
-        );
+        return grupo;
     }
 }
+

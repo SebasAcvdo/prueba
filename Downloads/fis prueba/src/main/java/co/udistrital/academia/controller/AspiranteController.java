@@ -1,8 +1,7 @@
 package co.udistrital.academia.controller;
 
 import co.udistrital.academia.dto.AspiranteCreateRequest;
-import co.udistrital.academia.dto.AspiranteResponse;
-import co.udistrital.academia.dto.EstadoAspiranteRequest;
+import co.udistrital.academia.entity.Aspirante;
 import co.udistrital.academia.service.AspiranteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -30,8 +29,8 @@ public class AspiranteController {
     @PreAuthorize("hasRole('ADMIN') or hasRole('ASPIRANTE')")
     @Operation(summary = "C.U 28 - Crear aspirante", 
                description = "Registra un nuevo aspirante con mínimo 1 estudiante")
-    public ResponseEntity<AspiranteResponse> crearAspirante(@Valid @RequestBody AspiranteCreateRequest request) {
-        AspiranteResponse response = aspiranteService.crearAspirante(request);
+    public ResponseEntity<Aspirante> crearAspirante(@Valid @RequestBody AspiranteCreateRequest request) {
+        Aspirante response = aspiranteService.crearAspirante(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -39,10 +38,10 @@ public class AspiranteController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "C.U 30 - Cambiar estado de aspirante", 
                description = "Actualiza el estado de inscripción (SIN_REVISAR, REVISADO, ESPERA_ENTREVISTA, etc.)")
-    public ResponseEntity<AspiranteResponse> cambiarEstado(
+    public ResponseEntity<Aspirante> cambiarEstado(
             @PathVariable Long id,
-            @Valid @RequestBody EstadoAspiranteRequest request) {
-        AspiranteResponse response = aspiranteService.cambiarEstado(id, request.estado());
+            @RequestParam String estado) {
+        Aspirante response = aspiranteService.cambiarEstado(id, estado);
         return ResponseEntity.ok(response);
     }
 
@@ -50,10 +49,10 @@ public class AspiranteController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "C.U 31 - Agendar entrevista a aspirante", 
                description = "Agenda fecha de entrevista y cambia estado a ESPERA_ENTREVISTA")
-    public ResponseEntity<AspiranteResponse> agendarEntrevista(
+    public ResponseEntity<Aspirante> agendarEntrevista(
             @PathVariable Long id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
-        AspiranteResponse response = aspiranteService.agendarEntrevista(id, fecha);
+        Aspirante response = aspiranteService.agendarEntrevista(id, fecha);
         return ResponseEntity.ok(response);
     }
 }

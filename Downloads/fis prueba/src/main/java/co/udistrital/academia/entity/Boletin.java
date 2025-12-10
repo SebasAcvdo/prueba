@@ -1,5 +1,6 @@
 package co.udistrital.academia.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -39,6 +40,7 @@ public class Boletin {
     @Builder.Default
     private List<Logro> logros = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "historia_academica_id")
     private HistoriaAcademica historiaAcademica;
