@@ -10,6 +10,8 @@ import co.udistrital.academia.repository.EstudianteRepository;
 import co.udistrital.academia.repository.GrupoRepository;
 import co.udistrital.academia.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -63,6 +65,19 @@ public class GrupoService {
     @Transactional(readOnly = true)
     public List<Grupo> listarGrupos() {
         return grupoRepository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Grupo> listarGruposPaginados(Pageable pageable, String estado) {
+        if (estado != null && !estado.isEmpty()) {
+            try {
+                Grupo.EstadoGrupo estadoEnum = Grupo.EstadoGrupo.valueOf(estado.toUpperCase());
+                return grupoRepository.findByEstado(estadoEnum, pageable);
+            } catch (IllegalArgumentException e) {
+                throw new InvalidOperationException("Estado inválido: " + estado);
+            }
+        }
+        return grupoRepository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)

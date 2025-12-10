@@ -9,11 +9,14 @@ import co.udistrital.academia.exception.ResourceNotFoundException;
 import co.udistrital.academia.repository.AspiranteRepository;
 import co.udistrital.academia.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -97,5 +100,23 @@ public class AspiranteService {
         aspirante.setFechaEntrevista(fecha);
 
         return aspiranteRepository.save(aspirante);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Aspirante> listarAspirantes(Pageable pageable, String estado) {
+        if (estado != null && !estado.isEmpty()) {
+            try {
+                Aspirante.EstadoInscripcion estadoEnum = Aspirante.EstadoInscripcion.valueOf(estado.toUpperCase());
+                return aspiranteRepository.findByEstadoInscripcion(estadoEnum, pageable);
+            } catch (IllegalArgumentException e) {
+                throw new InvalidOperationException("Estado inválido: " + estado);
+            }
+        }
+        return aspiranteRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Aspirante> listarTodos() {
+        return aspiranteRepository.findAll();
     }
 }

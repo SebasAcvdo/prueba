@@ -10,6 +10,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -61,6 +64,19 @@ public class GrupoController {
         headers.setContentDispositionFormData("attachment", "listado_grupo_" + id + ".pdf");
 
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/page")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESOR')")
+    @Operation(summary = "Listar grupos paginados", 
+               description = "Obtiene lista paginada de grupos con filtro opcional por estado")
+    public ResponseEntity<Page<Grupo>> listarGruposPaginados(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String estado) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Grupo> grupos = grupoService.listarGruposPaginados(pageable, estado);
+        return ResponseEntity.ok(grupos);
     }
 
     @GetMapping

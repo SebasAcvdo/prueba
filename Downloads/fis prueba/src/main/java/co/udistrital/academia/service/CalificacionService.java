@@ -15,6 +15,8 @@ import co.udistrital.academia.repository.EstudianteRepository;
 import co.udistrital.academia.repository.LogroRepository;
 import co.udistrital.academia.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -107,6 +109,21 @@ public class CalificacionService {
         return calificaciones.stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CalificacionResponse> listarCalificacionesPaginadas(Pageable pageable, Long estudianteId, Integer periodo) {
+        Page<Calificacion> calificaciones;
+
+        if (estudianteId != null && periodo != null) {
+            calificaciones = calificacionRepository.findByEstudianteIdAndPeriodo(estudianteId, periodo, pageable);
+        } else if (estudianteId != null) {
+            calificaciones = calificacionRepository.findByEstudianteId(estudianteId, pageable);
+        } else {
+            calificaciones = calificacionRepository.findAll(pageable);
+        }
+
+        return calificaciones.map(this::toResponse);
     }
 
     private CalificacionResponse toResponse(Calificacion calificacion) {

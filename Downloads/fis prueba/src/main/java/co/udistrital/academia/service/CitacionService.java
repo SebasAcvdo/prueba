@@ -11,6 +11,8 @@ import co.udistrital.academia.repository.AspiranteRepository;
 import co.udistrital.academia.repository.CitacionRepository;
 import co.udistrital.academia.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -113,6 +115,55 @@ public class CitacionService {
         return citacionRepository.findByTipo(tipoCitacion).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<CitacionResponse> listarCitacionesPaginadas(Pageable pageable, String tipo, String estado) {
+        Page<Citacion> citaciones;
+
+        if (tipo != null && !tipo.isEmpty() && estado != null && !estado.isEmpty()) {
+            try {
+                Citacion.TipoCitacion tipoEnum = Citacion.TipoCitacion.valueOf(tipo.toUpperCase());
+                Citacion.EstadoCita estadoEnum = Citacion.EstadoCita.valueOf(estado.toUpperCase());
+                citaciones = citacionRepository.findByTipoAndEstadoCita(tipoEnum, estadoEnum, pageable);
+            } catch (IllegalArgumentException e) {
+                throw new InvalidOperationException("Tipo o estado inválido");
+            }
+        } else if (tipo != null && !tipo.isEmpty()) {
+            try {
+                Citacion.TipoCitacion tipoEnum = Citacion.TipoCitacion.valueOf(tipo.toUpperCase());
+                citaciones = citacionRepository.findByTipo(tipoEnum, pageable);
+            } catch (IllegalArgumentException e) {
+                throw new InvalidOperationException("Tipo de citación inválido: " + tipo);
+            }
+        } else if (estado != null && !estado.isEmpty()) {
+            try {
+                Citacion.EstadoCita estadoEnum = Citacion.EstadoCita.valueOf(estado.toUpperCase());
+                citaciones = citacionRepository.findByEstadoCita(estadoEnum, pageable);
+            } catch (IllegalArgumentException e) {
+                throw new InvalidOperationException("Estado inválido: " + estado);
+            }
+        } else {
+            citaciones = citacionRepository.findAll(pageable);
+        }
+
+        return citaciones.map(this::toResponse);
+    }
+
+    @Transactional
+    public CitacionResponse cambiarEstado(Long id, String nuevoEstado) {
+        Citacion citacion = citacionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Citación no encontrada"));
+
+        try {
+            Citacion.EstadoCita estado = Citacion.EstadoCita.valueOf(nuevoEstado.toUpperCase());
+            citacion.setEstadoCita(estado);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidOperationException("Estado inválido: " + nuevoEstado);
+        }
+
+        citacion = citacionRepository.save(citacion);
+        return toResponse(citacion);
     }
 
     private CitacionResponse toResponse(Citacion citacion) {

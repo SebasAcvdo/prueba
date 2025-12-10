@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/aspirantes")
@@ -24,6 +28,28 @@ public class AspiranteController {
 
     @Autowired
     private AspiranteService aspiranteService;
+
+    @GetMapping("/page")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Listar aspirantes paginados", 
+               description = "Obtiene lista paginada de aspirantes con filtro opcional por estado")
+    public ResponseEntity<Page<Aspirante>> listarAspirantes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String estado) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Aspirante> aspirantes = aspiranteService.listarAspirantes(pageable, estado);
+        return ResponseEntity.ok(aspirantes);
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Listar todos los aspirantes", 
+               description = "Obtiene lista completa de aspirantes sin paginación")
+    public ResponseEntity<List<Aspirante>> listarTodosLosAspirantes() {
+        List<Aspirante> aspirantes = aspiranteService.listarTodos();
+        return ResponseEntity.ok(aspirantes);
+    }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('ASPIRANTE')")

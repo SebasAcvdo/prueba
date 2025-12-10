@@ -70,15 +70,15 @@ export const Dashboard = () => {
       <div className={styles.quickActions}>
         <h2 className={styles.quickActionsTitle}>Acciones Rápidas</h2>
         <div className={styles.actionButtons}>
-          <Button icon={TbPlus} onClick={() => navigate('/admin/usuarios')}>
-            Crear Usuario
+          <Button icon={TbUserPlus} onClick={() => navigate('/admin/aspirantes')}>
+            Gestionar Aspirantes
           </Button>
           <Button
-            icon={TbPlus}
+            icon={TbBell}
             variant="accent"
-            onClick={() => navigate('/admin/aspirantes')}
+            onClick={() => navigate('/admin/citaciones')}
           >
-            Registrar Aspirante
+            Gestionar Citaciones
           </Button>
           <Button icon={TbPlus} onClick={() => navigate('/admin/grupos')}>
             Crear Grupo
@@ -115,15 +115,14 @@ export const Dashboard = () => {
       <div className={styles.quickActions}>
         <h2 className={styles.quickActionsTitle}>Acciones Rápidas</h2>
         <div className={styles.actionButtons}>
-          <Button icon={TbPlus} onClick={() => navigate('/profesor/citaciones')}>
-            Nueva Citación
-          </Button>
           <Button
             icon={TbFileText}
-            variant="accent"
             onClick={() => navigate('/profesor/calificaciones')}
           >
-            Registrar Calificaciones
+            Gestionar Calificaciones
+          </Button>
+          <Button icon={TbBell} variant="accent" onClick={() => navigate('/profesor/citaciones')}>
+            Ver Citaciones
           </Button>
         </div>
       </div>
@@ -157,15 +156,14 @@ export const Dashboard = () => {
       <div className={styles.quickActions}>
         <h2 className={styles.quickActionsTitle}>Acceso Rápido</h2>
         <div className={styles.actionButtons}>
-          <Button icon={TbBell} onClick={() => navigate('/acudiente/citaciones')}>
-            Ver Citaciones
-          </Button>
           <Button
             icon={TbFileText}
-            variant="accent"
-            onClick={() => navigate('/acudiente/calificaciones')}
+            onClick={() => navigate('/acudiente/boletin')}
           >
-            Ver Calificaciones
+            Ver Boletín
+          </Button>
+          <Button icon={TbBell} variant="accent" onClick={() => navigate('/acudiente/citaciones')}>
+            Ver Citaciones
           </Button>
         </div>
       </div>

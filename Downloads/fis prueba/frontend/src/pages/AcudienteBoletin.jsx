@@ -1,0 +1,185 @@
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import styles from './AcudienteBoletin.module.css';
+import { Button } from '../components/common/Button';
+import { Spinner } from '../components/common/Spinner';
+import api from '../services/auth';
+
+export const AcudienteBoletin = () => {
+  const { user } = useAuth();
+  const [estudiantes, setEstudiantes] = useState([]);
+  const [selectedEstudiante, setSelectedEstudiante] = useState('');
+  const [periodo, setPeriodo] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    fetchEstudiantes();
+  }, []);
+
+  const fetchEstudiantes = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      // Obtener estudiantes del acudiente actual
+      const response = await api.get('/estudiantes', {
+        params: { acudienteId: user.id }
+      });
+      setEstudiantes(response.data);
+      if (response.data.length > 0) {
+        setSelectedEstudiante(response.data[0].id);
+      }
+    } catch (err) {
+      setError('Error al cargar estudiantes: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDownloadBoletin = async () => {
+    if (!selectedEstudiante) {
+      setError('Debe seleccionar un estudiante');
+      return;
+    }
+
+    try {
+      setDownloading(true);
+      setError('');
+      
+      const response = await api.get('/calificaciones/reporte/boletin', {
+        params: {
+          estudianteId: selectedEstudiante,
+          periodo: periodo
+        },
+        responseType: 'blob'
+      });
+
+      // Crear enlace de descarga
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `boletin_estudiante_${selectedEstudiante}_periodo_${periodo}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      setError('Error al descargar boletín: ' + (err.response?.data?.message || err.message));
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  const selectedEstudianteData = estudiantes.find(e => e.id === parseInt(selectedEstudiante));
+
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <Spinner />
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1>Boletín de Calificaciones</h1>
+        <p>Descarga el boletín académico de tus hijos</p>
+      </div>
+
+      {error && (
+        <div className={styles.error}>
+          {error}
+        </div>
+      )}
+
+      {estudiantes.length === 0 ? (
+        <div className={styles.emptyState}>
+          <p>No hay estudiantes registrados para este acudiente.</p>
+        </div>
+      ) : (
+        <div className={styles.content}>
+          <div className={styles.card}>
+            <h2>Seleccionar Estudiante y Periodo</h2>
+            
+            <div className={styles.form}>
+              <div className={styles.formGroup}>
+                <label htmlFor="estudiante">Estudiante:</label>
+                <select
+                  id="estudiante"
+                  value={selectedEstudiante}
+                  onChange={(e) => setSelectedEstudiante(e.target.value)}
+                  className={styles.select}
+                >
+                  {estudiantes.map((est) => (
+                    <option key={est.id} value={est.id}>
+                      {est.nombre} {est.apellido} - {est.grado}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label htmlFor="periodo">Periodo:</label>
+                <select
+                  id="periodo"
+                  value={periodo}
+                  onChange={(e) => setPeriodo(parseInt(e.target.value))}
+                  className={styles.select}
+                >
+                  <option value={1}>Periodo 1</option>
+                  <option value={2}>Periodo 2</option>
+                  <option value={3}>Periodo 3</option>
+                  <option value={4}>Periodo 4</option>
+                </select>
+              </div>
+
+              <Button
+                onClick={handleDownloadBoletin}
+                disabled={downloading || !selectedEstudiante}
+                variant="primary"
+              >
+                {downloading ? 'Descargando...' : 'Descargar Boletín PDF'}
+              </Button>
+            </div>
+          </div>
+
+          {selectedEstudianteData && (
+            <div className={styles.card}>
+              <h2>Información del Estudiante</h2>
+              <div className={styles.infoGrid}>
+                <div className={styles.infoItem}>
+                  <span className={styles.label}>Nombre:</span>
+                  <span className={styles.value}>
+                    {selectedEstudianteData.nombre} {selectedEstudianteData.apellido}
+                  </span>
+                </div>
+                <div className={styles.infoItem}>
+                  <span className={styles.label}>Grado:</span>
+                  <span className={styles.value}>{selectedEstudianteData.grado}</span>
+                </div>
+                <div className={styles.infoItem}>
+                  <span className={styles.label}>Registro Civil:</span>
+                  <span className={styles.value}>{selectedEstudianteData.regCivil}</span>
+                </div>
+                <div className={styles.infoItem}>
+                  <span className={styles.label}>Estado:</span>
+                  <span className={`${styles.badge} ${styles[selectedEstudianteData.estado.toLowerCase()]}`}>
+                    {selectedEstudianteData.estado}
+                  </span>
+                </div>
+                {selectedEstudianteData.grupo && (
+                  <div className={styles.infoItem}>
+                    <span className={styles.label}>Grupo:</span>
+                    <span className={styles.value}>{selectedEstudianteData.grupo.nombre}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
