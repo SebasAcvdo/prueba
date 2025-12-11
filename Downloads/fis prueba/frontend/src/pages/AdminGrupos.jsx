@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Layout } from '../components/common/Layout';
 import { Button } from '../components/common/Button';
 import { Spinner } from '../components/common/Spinner';
-import { TbPlus, TbCheck, TbUsers, TbDownload } from 'react-icons/tb';
+import { TbPlus, TbCheck, TbUsers, TbDownload, TbTrash } from 'react-icons/tb';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/auth';
 import styles from './AdminGrupos.module.css';
@@ -205,9 +205,11 @@ export const AdminGrupos = () => {
                 )}
                 
                 <Button
+                  icon={TbTrash}
                   size="small"
                   variant="danger"
                   onClick={() => handleEliminar(grupo.id)}
+                  style={{ backgroundColor: '#dc2626', color: 'white' }}
                 >
                   Eliminar
                 </Button>

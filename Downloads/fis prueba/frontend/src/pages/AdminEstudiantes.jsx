@@ -234,7 +234,7 @@ export const AdminEstudiantes = () => {
                   >
                     <option value="">Seleccione...</option>
                     {grupos
-                      .filter(g => g.estado === 'ACTIVO')
+                      .filter(g => g.estado === 'ACTIVO' || g.estado === 'BORRADOR')
                       .map((grupo) => {
                         const capacidadDisponible = grupo.capacidad - (grupo.estudiantes?.length || 0);
                         const estaLleno = capacidadDisponible <= 0;
