@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }) => {
       nombre: response.nombre,
       correo: response.correo,
       rol: response.rol,
+      cambiarPass: response.cambiarPass || false,
     };
     setUser(userData);
     setToken(response.accessToken);

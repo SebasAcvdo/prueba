@@ -91,7 +91,7 @@ export const AspiranteEstado = () => {
       <div className={styles.container}>
         <div className={styles.header}>
           <h1>Estado de tu Solicitud</h1>
-          <p>Consulta el estado de tu pre-inscripción en Academia Veritas</p>
+          <p>Consulta el estado de tu pre-inscripción en Jardín Aprendiendo Juntos</p>
         </div>
 
         <div className={styles.statusCard} style={{ borderLeftColor: getEstadoColor(aspirante.estadoInscripcion) }}>
@@ -146,7 +146,7 @@ export const AspiranteEstado = () => {
         <div className={styles.ayudaCard}>
           <h3>¿Necesitas ayuda?</h3>
           <p>Si tienes preguntas sobre tu solicitud, contáctanos:</p>
-          <p>📧 Email: admisiones@academiaveritas.edu</p>
+          <p>📧 Email: admisiones@jardinaprendiendojuntos.edu</p>
           <p>📞 Teléfono: (601) 123-4567</p>
         </div>
       </div>

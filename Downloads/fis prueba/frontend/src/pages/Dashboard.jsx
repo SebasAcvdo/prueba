@@ -196,7 +196,7 @@ export const Dashboard = () => {
             {getGreeting()}, {user?.nombre}
           </h1>
           <p className={styles.welcomeSubtitle}>
-            Bienvenido al sistema de gestión educativa Veritas
+            Bienvenido al sistema de gestión educativa Jardín Aprendiendo Juntos
           </p>
         </div>
 

@@ -127,7 +127,7 @@ export const ProfesorCitaciones = () => {
                       <div className={styles.participantesList}>
                         {citacion.acudientes.map((acudiente, idx) => (
                           <div key={idx} className={styles.participante}>
-                            {acudiente.nombre} - {acudiente.email}
+                            {acudiente.nombre} - {acudiente.correo}
                           </div>
                         ))}
                       </div>
@@ -143,7 +143,7 @@ export const ProfesorCitaciones = () => {
                       <div className={styles.participantesList}>
                         {citacion.aspirantes.map((aspirante, idx) => (
                           <div key={idx} className={styles.participante}>
-                            {aspirante.nombre} - {aspirante.email}
+                            {aspirante.nombre} - {aspirante.correo}
                           </div>
                         ))}
                       </div>

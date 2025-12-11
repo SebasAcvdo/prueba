@@ -4,7 +4,6 @@ import { ToastProvider } from './contexts/ToastContext';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
 import { Toaster } from 'react-hot-toast';
 import { Login } from './pages/Login';
-import { FirstLogin } from './pages/FirstLogin';
 import { Dashboard } from './pages/Dashboard';
 import { NotFound } from './components/common/NotFound';
 import { ProfesorCalificaciones } from './pages/ProfesorCalificaciones';
@@ -22,6 +21,11 @@ import { AcudienteCitaciones } from './pages/AcudienteCitaciones';
 import { AcudienteObservador } from './pages/AcudienteObservador';
 import { AspiranteForm } from './pages/AspiranteForm';
 import { AspiranteEstado } from './pages/AspiranteEstado';
+import RegistroCorreo from './pages/Aspirante/RegistroCorreo';
+import FirstLogin from './pages/Aspirante/FirstLogin';
+import AspiranteDashboard from './pages/Aspirante/AspiranteDashboard';
+import Preinscripcion from './pages/Aspirante/Preinscripcion';
+import EstadoInscripcion from './pages/Aspirante/EstadoInscripcion';
 import './styles/index.css';
 
 function App() {
@@ -45,6 +49,21 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/first-login" element={<FirstLogin />} />
             <Route path="/pre-inscripcion" element={<AspiranteForm />} />
+            
+            {/* Rutas públicas Aspirante - NUEVO FLUJO SIMPLE */}
+            <Route path="/aspirante/preinscripcion" element={<Preinscripcion />} />
+            <Route path="/aspirante/estado" element={<EstadoInscripcion />} />
+            <Route path="/aspirante/registro" element={<RegistroCorreo />} />
+            
+            {/* Rutas protegidas Aspirante */}
+            <Route
+              path="/aspirante"
+              element={
+                <ProtectedRoute allowedRoles={['ASPIRANTE']}>
+                  <AspiranteDashboard />
+                </ProtectedRoute>
+              }
+            />
 
             <Route
               path="/dashboard"
@@ -150,6 +169,24 @@ function App() {
             {/* Rutas Acudiente */}
             <Route
               path="/acudiente/boletin"
+              element={
+                <ProtectedRoute allowedRoles={['ACUDIENTE']}>
+                  <AcudienteBoletin />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/acudiente/calificaciones"
+              element={
+                <ProtectedRoute allowedRoles={['ACUDIENTE']}>
+                  <AcudienteBoletin />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/acudiente/boletines"
               element={
                 <ProtectedRoute allowedRoles={['ACUDIENTE']}>
                   <AcudienteBoletin />

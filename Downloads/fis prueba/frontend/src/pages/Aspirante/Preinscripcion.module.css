@@ -1,0 +1,188 @@
+/* Variables globales */
+:root {
+  --primary: #0F1A30;
+  --accent: #FA761B;
+  --bgPage: #F7F9FC;
+  --white: #FFFFFF;
+  --grayBorder: #E5E7EB;
+  --grayText: #6B7280;
+  --errorRed: #DC2626;
+  --radius: 8px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Contenedor principal */
+.pageContainer {
+  min-height: 100vh;
+  background: var(--bgPage);
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Tarjeta del formulario */
+.formCard {
+  background: var(--white);
+  padding: 32px;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  max-width: 700px;
+  width: 100%;
+}
+
+/* Títulos */
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+  margin: 0 0 8px 0;
+  text-align: center;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--grayText);
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+/* Alerta de error */
+.errorAlert {
+  background: #FEE2E2;
+  border: 1px solid #FECACA;
+  color: var(--errorRed);
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+/* Formulario */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Fieldset */
+.fieldset {
+  border: 1px solid var(--grayBorder);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin: 0;
+}
+
+.legend {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--primary);
+  padding: 0 8px;
+}
+
+/* Grupos de formulario */
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Labels */
+.label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--primary);
+}
+
+.required {
+  color: var(--errorRed);
+}
+
+/* Inputs y textarea */
+.input,
+.textarea {
+  border: 1px solid var(--grayBorder);
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  width: 100%;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(250, 118, 27, 0.1);
+}
+
+.inputError {
+  border-color: var(--errorRed);
+}
+
+.inputError:focus {
+  box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Texto de error */
+.errorText {
+  font-size: 12px;
+  color: var(--errorRed);
+  margin-top: 4px;
+}
+
+/* Botón primario */
+.btnPrimary {
+  background: var(--accent);
+  color: var(--white);
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.2s;
+  width: 100%;
+  margin-top: 8px;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  filter: brightness(0.9);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btnPrimary:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .formCard {
+    padding: 24px 20px;
+  }
+
+  .pageContainer {
+    padding: 20px 12px;
+  }
+}

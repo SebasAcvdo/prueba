@@ -39,7 +39,17 @@ export const FirstLogin = () => {
     try {
       setLoading(true);
       await resetPassword(usuario, newPassword);
-      navigate('/dashboard');
+      
+      // Redirigir según el rol del usuario
+      if (rol === 'ASPIRANTE') {
+        navigate('/aspirante');
+      } else if (rol === 'PROFESOR') {
+        navigate('/profesor');
+      } else if (rol === 'ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Error al cambiar la contraseña');
     } finally {

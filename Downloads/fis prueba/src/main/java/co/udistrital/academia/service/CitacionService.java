@@ -204,16 +204,20 @@ public class CitacionService {
     }
 
     private CitacionResponse toResponse(Citacion citacion) {
-        List<String> acudientes = citacion.getAcudientes().stream()
-                .map(Usuario::getNombre)
+        List<co.udistrital.academia.dto.UsuarioSimpleDTO> acudientes = citacion.getAcudientes().stream()
+                .map(u -> new co.udistrital.academia.dto.UsuarioSimpleDTO(u.getId(), u.getNombre(), u.getCorreo()))
                 .collect(Collectors.toList());
 
-        List<String> profesores = citacion.getProfesores().stream()
-                .map(Usuario::getNombre)
+        List<co.udistrital.academia.dto.UsuarioSimpleDTO> profesores = citacion.getProfesores().stream()
+                .map(u -> new co.udistrital.academia.dto.UsuarioSimpleDTO(u.getId(), u.getNombre(), u.getCorreo()))
                 .collect(Collectors.toList());
 
-        List<Long> aspiranteIds = citacion.getAspirantes().stream()
-                .map(Aspirante::getId)
+        List<co.udistrital.academia.dto.AspiranteSimpleDTO> aspirantes = citacion.getAspirantes().stream()
+                .map(a -> new co.udistrital.academia.dto.AspiranteSimpleDTO(
+                    a.getId(), 
+                    a.getUsuario() != null ? a.getUsuario().getNombre() : "Sin nombre",
+                    a.getUsuario() != null ? a.getUsuario().getCorreo() : "Sin correo"
+                ))
                 .collect(Collectors.toList());
 
         return new CitacionResponse(
@@ -224,7 +228,7 @@ public class CitacionService {
                 citacion.getEstadoCita().name(),
                 acudientes,
                 profesores,
-                aspiranteIds
+                aspirantes
         );
     }
 }

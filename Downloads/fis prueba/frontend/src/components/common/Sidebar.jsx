@@ -48,7 +48,7 @@ export const Sidebar = ({ isOpen, onClose }) => {
       <aside className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
         <div className={styles.logo}>
           <LogoVeritas color="white" width={32} height={32} />
-          <span className={styles.logoText}>Veritas</span>
+          <span className={styles.logoText}>Jardín Aprendiendo Juntos</span>
         </div>
 
         <nav className={styles.nav}>

@@ -13,5 +13,7 @@ public interface AspiranteRepository extends JpaRepository<Aspirante, Long> {
     
     Optional<Aspirante> findByUsuarioId(Long usuarioId);
     
+    Optional<Aspirante> findByUsuarioCorreo(String correo);
+    
     Page<Aspirante> findByEstadoInscripcion(Aspirante.EstadoInscripcion estado, Pageable pageable);
 }

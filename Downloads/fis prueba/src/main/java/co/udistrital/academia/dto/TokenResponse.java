@@ -7,9 +7,10 @@ public record TokenResponse(
     Long usuarioId,
     String nombre,
     String correo,
-    String rol
+    String rol,
+    Boolean cambiarPass
 ) {
-    public TokenResponse(String accessToken, Long expiresIn, Long usuarioId, String nombre, String correo, String rol) {
-        this(accessToken, "Bearer", expiresIn, usuarioId, nombre, correo, rol);
+    public TokenResponse(String accessToken, Long expiresIn, Long usuarioId, String nombre, String correo, String rol, Boolean cambiarPass) {
+        this(accessToken, "Bearer", expiresIn, usuarioId, nombre, correo, rol, cambiarPass);
     }
 }

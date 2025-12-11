@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { TbLogin } from 'react-icons/tb';
 import { useAuth } from '../contexts/AuthContext';
 import { Input } from '../components/forms/Input';
@@ -8,12 +8,22 @@ import LogoVeritas from '../assets/LogoVeritas';
 import styles from './Login.module.css';
 
 export const Login = () => {
-  const [usuario, setUsuario] = useState('');
+  const [searchParams] = useSearchParams();
+  const esAspirante = searchParams.get('esAspirante') === 'true';
+  const correoParam = searchParams.get('correo') || '';
+  
+  const [usuario, setUsuario] = useState(correoParam);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  
+  useEffect(() => {
+    if (correoParam) {
+      setUsuario(correoParam);
+    }
+  }, [correoParam]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,8 +38,15 @@ export const Login = () => {
       setLoading(true);
       const response = await login(usuario, password);
 
-      if (response.debeResetearPassword) {
-        navigate('/first-login', { state: { usuario } });
+      // Redirigir según el rol del usuario (response ya tiene los datos directamente)
+      const rol = response.rol;
+      
+      if (rol === 'ASPIRANTE') {
+        navigate('/aspirante');
+      } else if (rol === 'PROFESOR') {
+        navigate('/profesor');
+      } else if (rol === 'ADMIN') {
+        navigate('/admin');
       } else {
         navigate('/dashboard');
       }
@@ -46,7 +63,7 @@ export const Login = () => {
         <div className={styles.logo}>
           <LogoVeritas color="white" width={80} height={80} />
         </div>
-        <h1 className={styles.welcomeText}>Bienvenido a Veritas</h1>
+        <h1 className={styles.welcomeText}>Bienvenido a Jardín Aprendiendo Juntos</h1>
         <p className={styles.subtitle}>
           Sistema de Gestión Educativa para mejorar la experiencia de aprendizaje
         </p>
@@ -61,14 +78,21 @@ export const Login = () => {
 
           {error && <div className={styles.error}>{error}</div>}
 
+          {esAspirante && (
+            <div className={styles.infoAspirante}>
+              <p>✉️ <strong>Usa la clave temporal que recibiste</strong></p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className={styles.form}>
             <Input
-              label="Usuario"
+              label="Usuario o Correo"
               type="text"
               value={usuario}
               onChange={(e) => setUsuario(e.target.value)}
-              placeholder="Tu usuario"
+              placeholder="Tu usuario o correo"
               required
+              readOnly={esAspirante && correoParam !== ''}
             />
 
             <Input
@@ -92,9 +116,9 @@ export const Login = () => {
           </form>
 
           <div className={styles.preInscripcion}>
-            <p>¿Eres nuevo?</p>
-            <a href="/pre-inscripcion" className={styles.linkPreInscripcion}>
-              Registra tu pre-inscripción aquí
+            <p>¿Eres aspirante nuevo?</p>
+            <a href="/aspirante/preinscripcion" className={styles.linkPreInscripcion}>
+              Completa tu pre-inscripción aquí
             </a>
           </div>
         </div>

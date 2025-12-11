@@ -70,7 +70,7 @@ export const AspiranteForm = () => {
       <div className={styles.formCard}>
         <div className={styles.header}>
           <h1>Pre-Inscripción</h1>
-          <p>Completa el formulario para pre-inscribir a tus hijos en Academia Veritas</p>
+          <p>Completa el formulario para pre-inscribir a tus hijos en Jardín Aprendiendo Juntos</p>
         </div>
 
         {error && <div className={styles.error}>{error}</div>}

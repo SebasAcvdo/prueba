@@ -33,4 +33,13 @@ public class AuthController {
         TokenResponse response = authService.firstLogin(request);
         return ResponseEntity.ok(response);
     }
+
+    @PutMapping("/reset-password")
+    @Operation(summary = "Resetear contraseña", description = "Permite cambiar la contraseña del usuario autenticado")
+    public ResponseEntity<String> resetPassword(
+            @RequestParam String correo,
+            @RequestParam String nuevaPassword) {
+        authService.resetPassword(correo, nuevaPassword);
+        return ResponseEntity.ok("Contraseña actualizada exitosamente");
+    }
 }

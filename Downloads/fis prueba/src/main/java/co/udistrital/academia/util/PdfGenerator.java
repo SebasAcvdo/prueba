@@ -261,9 +261,9 @@ public class PdfGenerator {
 
         // Logo placeholder (puedes agregar imagen real aquí)
         Cell logoCell = new Cell()
-                .add(new Paragraph("VERITAS")
+                .add(new Paragraph("JARDÍN APRENDIENDO JUNTOS")
                         .setFont(fontBold)
-                        .setFontSize(24)
+                        .setFontSize(18)
                         .setFontColor(TEXT_PRIMARY)
                         .setTextAlignment(TextAlignment.CENTER))
                 .setVerticalAlignment(VerticalAlignment.MIDDLE)
