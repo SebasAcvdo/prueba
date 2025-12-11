@@ -3,10 +3,12 @@ import { Layout } from '../components/common/Layout';
 import { Button } from '../components/common/Button';
 import { Spinner } from '../components/common/Spinner';
 import { TbPlus, TbCheck, TbUsers, TbDownload } from 'react-icons/tb';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/auth';
 import styles from './AdminGrupos.module.css';
 
 export const AdminGrupos = () => {
+  const navigate = useNavigate();
   const [grupos, setGrupos] = useState([]);
   const [profesores, setProfesores] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -16,9 +18,8 @@ export const AdminGrupos = () => {
   const [formData, setFormData] = useState({
     nombre: '',
     grado: '',
-    jornada: 'MANANA',
     profesorId: '',
-    capacidad: 20
+    capacidad: 10
   });
 
   useEffect(() => {
@@ -41,12 +42,14 @@ export const AdminGrupos = () => {
 
   const fetchProfesores = async () => {
     try {
-      const response = await api.get('/usuarios', {
-        params: { rol: 'PROFESOR' }
+      const response = await api.get('/usuarios/page', {
+        params: { rol: 'PROFESOR', page: 0, size: 100 }
       });
-      setProfesores(response.data.content || response.data);
+      console.log('Profesores cargados:', response.data);
+      setProfesores(response.data.content || []);
     } catch (err) {
       console.error('Error al cargar profesores:', err);
+      setError('Error al cargar profesores: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -61,9 +64,8 @@ export const AdminGrupos = () => {
       setFormData({
         nombre: '',
         grado: '',
-        jornada: 'MANANA',
         profesorId: '',
-        capacidad: 20
+        capacidad: 10
       });
       fetchGrupos();
       setTimeout(() => setSuccess(''), 3000);
@@ -101,6 +103,21 @@ export const AdminGrupos = () => {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       setError('Error al descargar listado: ' + (err.response?.data?.message || err.message));
+    }
+  };
+
+  const handleEliminar = async (grupoId) => {
+    if (!window.confirm('¿Está seguro de eliminar este grupo?')) return;
+    
+    try {
+      setError('');
+      setSuccess('');
+      await api.delete(`/grupos/${grupoId}`);
+      setSuccess('Grupo eliminado exitosamente');
+      fetchGrupos();
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError('Error al eliminar grupo: ' + (err.response?.data?.message || err.message));
     }
   };
 
@@ -146,10 +163,6 @@ export const AdminGrupos = () => {
                   <span className={styles.infoValue}>{grupo.grado}</span>
                 </div>
                 <div className={styles.infoItem}>
-                  <span className={styles.infoLabel}>Jornada:</span>
-                  <span className={styles.infoValue}>{grupo.jornada}</span>
-                </div>
-                <div className={styles.infoItem}>
                   <span className={styles.infoLabel}>Profesor:</span>
                   <span className={styles.infoValue}>{grupo.profesor?.nombre || 'No asignado'}</span>
                 </div>
@@ -162,25 +175,42 @@ export const AdminGrupos = () => {
               </div>
 
               <div className={styles.grupoActions}>
+                <Button
+                  icon={TbUsers}
+                  size="small"
+                  variant="outline"
+                  onClick={() => navigate('/admin/estudiantes')}
+                >
+                  Gestionar Estudiantes
+                </Button>
+                
                 {grupo.estado === 'BORRADOR' && (
                   <Button
                     icon={TbCheck}
                     size="small"
                     onClick={() => handleConfirmar(grupo.id)}
                   >
-                    Confirmar Grupo
+                    Confirmar
                   </Button>
                 )}
+                
                 {grupo.estado === 'ACTIVO' && (
                   <Button
                     icon={TbDownload}
-                    variant="outline"
                     size="small"
                     onClick={() => handleDescargarListado(grupo.id)}
                   >
-                    Descargar Listado
+                    Descargar PDF
                   </Button>
                 )}
+                
+                <Button
+                  size="small"
+                  variant="danger"
+                  onClick={() => handleEliminar(grupo.id)}
+                >
+                  Eliminar
+                </Button>
               </div>
             </div>
           ))}
@@ -211,21 +241,9 @@ export const AdminGrupos = () => {
                     required
                   >
                     <option value="">Seleccione...</option>
-                    <option value="JARDIN">Jardín</option>
-                    <option value="TRANSICION">Transición</option>
-                  </select>
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label htmlFor="jornada">Jornada:</label>
-                  <select
-                    id="jornada"
-                    value={formData.jornada}
-                    onChange={(e) => setFormData({ ...formData, jornada: e.target.value })}
-                    required
-                  >
-                    <option value="MANANA">Mañana</option>
-                    <option value="TARDE">Tarde</option>
+                    <option value="Párvulos">Párvulos</option>
+                    <option value="Caminadores">Caminadores</option>
+                    <option value="Pre-jardín">Pre-jardín</option>
                   </select>
                 </div>
 
@@ -238,12 +256,19 @@ export const AdminGrupos = () => {
                     required
                   >
                     <option value="">Seleccione...</option>
-                    {profesores.map((prof) => (
-                      <option key={prof.id} value={prof.id}>
-                        {prof.nombre} {prof.apellido}
-                      </option>
-                    ))}
+                    {profesores.length > 0 ? (
+                      profesores.map((prof) => (
+                        <option key={prof.id} value={prof.id}>
+                          {prof.nombre}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>No hay profesores disponibles</option>
+                    )}
                   </select>
+                  {profesores.length === 0 && (
+                    <small style={{color: 'orange'}}>Cargando profesores...</small>
+                  )}
                 </div>
 
                 <div className={styles.modalActions}>

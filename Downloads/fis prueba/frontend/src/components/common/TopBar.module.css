@@ -33,6 +33,13 @@
   background-color: var(--bg-secondary);
 }
 
+/* Ocultar botón hamburguesa en desktop */
+@media (min-width: 1025px) {
+  .menuButton {
+    display: none;
+  }
+}
+
 .title {
   font-size: 1.25rem;
   font-weight: 600;

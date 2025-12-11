@@ -4,6 +4,7 @@ import {
   TbUsers,
   TbUserPlus,
   TbSchool,
+  TbSchoolOff,
   TbBell,
   TbFileText,
   TbClipboardList,
@@ -18,6 +19,7 @@ const menuItems = {
     { path: '/admin/usuarios', label: 'Usuarios', icon: TbUsers },
     { path: '/admin/aspirantes', label: 'Aspirantes', icon: TbUserPlus },
     { path: '/admin/grupos', label: 'Grupos', icon: TbSchool },
+    { path: '/admin/estudiantes', label: 'Gestión Estudiantes', icon: TbSchoolOff },
   ],
   PROFESOR: [
     { path: '/dashboard', label: 'Inicio', icon: TbHome },

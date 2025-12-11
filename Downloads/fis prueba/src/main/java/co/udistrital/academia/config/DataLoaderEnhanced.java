@@ -34,7 +34,7 @@ public class DataLoaderEnhanced {
             "Torres", "Flores", "Rivera", "Gómez", "Díaz", "Cruz", "Morales", "Herrera", "Jiménez", "Méndez",
             "Castro", "Ortiz", "Ruiz", "Vargas", "Silva", "Rojas", "Molina", "Gutiérrez", "Castillo", "Reyes"};
 
-    private final String[] grados = {"Párvulos", "Caminadores", "Pre-jardín", "Jardín", "Transición"};
+    private final String[] grados = {"Párvulos", "Caminadores", "Pre-jardín"};
 
     @Bean
     @Profile("dev")
@@ -98,7 +98,7 @@ public class DataLoaderEnhanced {
                     Grupo grupo = Grupo.builder()
                             .nombre(grado + " " + (char) ('A' + i))
                             .grado(grado)
-                            .capacidad(20)
+                            .capacidad(10)
                             .estado(i < 2 ? Grupo.EstadoGrupo.ACTIVO : Grupo.EstadoGrupo.BORRADOR)
                             .profesor(profesores.get(profesorIndex % profesores.size()))
                             .build();

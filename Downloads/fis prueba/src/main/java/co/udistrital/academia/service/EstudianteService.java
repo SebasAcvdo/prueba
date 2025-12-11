@@ -29,4 +29,10 @@ public class EstudianteService {
         return estudianteRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con id: " + id));
     }
+
+    public void quitarDeGrupo(Long estudianteId) {
+        Estudiante estudiante = obtenerPorId(estudianteId);
+        estudiante.setGrupo(null);
+        estudianteRepository.save(estudiante);
+    }
 }

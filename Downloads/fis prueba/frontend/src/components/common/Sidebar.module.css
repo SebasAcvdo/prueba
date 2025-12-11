@@ -9,10 +9,7 @@
   flex-direction: column;
   transition: transform 0.3s ease;
   z-index: 200;
-}
-
-.sidebar.collapsed {
-  transform: translateX(-260px);
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
 .logo {
@@ -67,13 +64,24 @@
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 150;
   display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .overlay.visible {
   display: block;
+  opacity: 1;
 }
 
-@media (max-width: 768px) {
+/* Desktop: siempre visible */
+@media (min-width: 1025px) {
+  .sidebar {
+    transform: translateX(0);
+  }
+}
+
+/* Tablet y móvil: oculta por defecto, se muestra con .open */
+@media (max-width: 1024px) {
   .sidebar {
     transform: translateX(-260px);
   }
@@ -81,4 +89,21 @@
   .sidebar.open {
     transform: translateX(0);
   }
+
+  .overlay.visible {
+    display: block;
+  }
 }
+
+/* Móviles: sidebar más ancha */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 280px;
+    transform: translateX(-280px);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+}
+

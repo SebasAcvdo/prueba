@@ -16,17 +16,31 @@ api.interceptors.request.use(
     const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log('Token enviado:', token.substring(0, 20) + '...');
+    } else {
+      console.warn('No hay token en localStorage');
     }
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-// Interceptor para reintentar en errores 500
+// Interceptor para manejar errores de respuesta
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    
+    // Si es 401 o 403, redirigir al login (token expirado o inválido)
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      // Solo redirigir si no es la ruta de login
+      if (!originalRequest.url.includes('/auth/login')) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+        return Promise.reject(error);
+      }
+    }
     
     // Reintentar en errores 500 (máximo 2 reintentos)
     if (

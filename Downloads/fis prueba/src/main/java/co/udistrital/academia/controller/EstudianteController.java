@@ -37,4 +37,12 @@ public class EstudianteController {
         Estudiante estudiante = estudianteService.obtenerPorId(id);
         return ResponseEntity.ok(estudiante);
     }
+
+    @DeleteMapping("/{id}/grupo")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Quitar estudiante de su grupo", description = "Desasigna un estudiante de su grupo actual")
+    public ResponseEntity<Void> quitarDeGrupo(@PathVariable Long id) {
+        estudianteService.quitarDeGrupo(id);
+        return ResponseEntity.noContent().build();
+    }
 }

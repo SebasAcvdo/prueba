@@ -82,8 +82,8 @@ public class GrupoController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESOR')")
     @Operation(summary = "Listar todos los grupos", description = "Obtiene la lista completa de grupos con filtro opcional por profesor")
-    public ResponseEntity<List<Grupo>> listarGrupos(@RequestParam(required = false) Long profesorId) {
-        List<Grupo> grupos = grupoService.listarGrupos(profesorId);
+    public ResponseEntity<List<co.udistrital.academia.dto.GrupoResponse>> listarGrupos(@RequestParam(required = false) Long profesorId) {
+        List<co.udistrital.academia.dto.GrupoResponse> grupos = grupoService.listarGrupos(profesorId);
         return ResponseEntity.ok(grupos);
     }
 
@@ -92,6 +92,35 @@ public class GrupoController {
     @Operation(summary = "Obtener grupo por ID", description = "Obtiene los detalles de un grupo específico")
     public ResponseEntity<Grupo> obtenerGrupo(@PathVariable Long id) {
         Grupo response = grupoService.obtenerGrupo(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Eliminar grupo", description = "Elimina un grupo del sistema")
+    public ResponseEntity<Void> eliminarGrupo(@PathVariable Long id) {
+        grupoService.eliminarGrupo(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/estudiantes")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Asignar estudiantes al grupo", description = "Asigna una lista de estudiantes a un grupo")
+    public ResponseEntity<Grupo> asignarEstudiantes(
+            @PathVariable Long id,
+            @RequestBody List<Long> estudianteIds) {
+        Grupo response = grupoService.asignarEstudiantes(id, estudianteIds);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/estudiantes")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Agregar estudiante al grupo", description = "Agrega un estudiante al grupo")
+    public ResponseEntity<Grupo> agregarEstudiante(
+            @PathVariable Long id,
+            @RequestBody java.util.Map<String, Long> request) {
+        Long estudianteId = request.get("estudianteId");
+        Grupo response = grupoService.agregarEstudiante(id, estudianteId);
         return ResponseEntity.ok(response);
     }
 }

@@ -28,7 +28,7 @@ public class Grupo {
 
     @Column(nullable = false)
     @Builder.Default
-    private Integer capacidad = 20;
+    private Integer capacidad = 10;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)

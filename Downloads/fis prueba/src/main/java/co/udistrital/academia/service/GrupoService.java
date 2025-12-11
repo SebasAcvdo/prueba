@@ -1,6 +1,8 @@
 package co.udistrital.academia.service;
 
+import co.udistrital.academia.dto.EstudianteSimpleResponse;
 import co.udistrital.academia.dto.GrupoRequest;
+import co.udistrital.academia.dto.GrupoResponse;
 import co.udistrital.academia.entity.Estudiante;
 import co.udistrital.academia.entity.Grupo;
 import co.udistrital.academia.entity.Usuario;
@@ -49,13 +51,40 @@ public class GrupoService {
         return grupo;
     }
 
-    public List<Grupo> listarGrupos(Long profesorId) {
+    public List<GrupoResponse> listarGrupos(Long profesorId) {
+        List<Grupo> grupos;
         if (profesorId != null) {
-            return grupoRepository.findAll().stream()
+            grupos = grupoRepository.findAll().stream()
                 .filter(g -> g.getProfesor() != null && g.getProfesor().getId().equals(profesorId))
                 .toList();
+        } else {
+            grupos = grupoRepository.findAll();
         }
-        return grupoRepository.findAll();
+        return grupos.stream().map(this::convertirAGrupoResponse).toList();
+    }
+
+    private GrupoResponse convertirAGrupoResponse(Grupo grupo) {
+        return new GrupoResponse(
+            grupo.getId(),
+            grupo.getNombre(),
+            grupo.getGrado(),
+            grupo.getCapacidad(),
+            grupo.getEstado().name(),
+            grupo.getProfesor() != null ? grupo.getProfesor().getNombre() : null,
+            grupo.getEstudiantes() != null ? grupo.getEstudiantes().size() : 0,
+            grupo.getEstudiantes() != null 
+                ? grupo.getEstudiantes().stream()
+                    .map(e -> new EstudianteSimpleResponse(
+                        e.getId(), 
+                        e.getNombre(), 
+                        e.getApellido(),
+                        e.getGrado() != null ? e.getGrado() : "",
+                        e.getRegCivil() != null ? e.getRegCivil() : "",
+                        e.getEstado() != null ? e.getEstado().name() : ""
+                    ))
+                    .toList()
+                : List.of()
+        );
     }
 
     @Transactional
@@ -96,25 +125,81 @@ public class GrupoService {
     }
 
     @Transactional
+    public void eliminarGrupo(Long id) {
+        Grupo grupo = grupoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Grupo no encontrado"));
+        
+        // Desasignar estudiantes del grupo
+        grupo.getEstudiantes().forEach(estudiante -> {
+            estudiante.setGrupo(null);
+            estudianteRepository.save(estudiante);
+        });
+        
+        grupoRepository.delete(grupo);
+    }
+
+    @Transactional
+    public Grupo asignarEstudiantes(Long grupoId, List<Long> estudianteIds) {
+        Grupo grupo = grupoRepository.findById(grupoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Grupo no encontrado"));
+
+        if (estudianteIds.size() > grupo.getCapacidad()) {
+            throw new InvalidOperationException(
+                "No se pueden asignar " + estudianteIds.size() + 
+                " estudiantes. Capacidad máxima: " + grupo.getCapacidad()
+            );
+        }
+
+        // Desasignar estudiantes actuales que no están en la nueva lista
+        grupo.getEstudiantes().forEach(estudiante -> {
+            if (!estudianteIds.contains(estudiante.getId())) {
+                estudiante.setGrupo(null);
+                estudianteRepository.save(estudiante);
+            }
+        });
+
+        // Asignar nuevos estudiantes
+        for (Long estudianteId : estudianteIds) {
+            Estudiante estudiante = estudianteRepository.findById(estudianteId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con ID: " + estudianteId));
+            
+            estudiante.setGrupo(grupo);
+            estudianteRepository.save(estudiante);
+        }
+
+        return grupoRepository.findById(grupoId).orElseThrow();
+    }
+
+    @Transactional
     public Grupo agregarEstudiante(Long grupoId, Long estudianteId) {
         Grupo grupo = grupoRepository.findById(grupoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Grupo no encontrado"));
 
-        if (grupo.getEstudiantes().size() >= grupo.getCapacidad()) {
-            throw new InvalidOperationException("El grupo ha alcanzado su capacidad máxima de " + grupo.getCapacidad());
+        // Verificar capacidad
+        long estudiantesActuales = estudianteRepository.findAll().stream()
+                .filter(e -> e.getGrupo() != null && e.getGrupo().getId().equals(grupoId))
+                .count();
+
+        if (estudiantesActuales >= grupo.getCapacidad()) {
+            throw new InvalidOperationException(
+                "El grupo está lleno. Capacidad máxima: " + grupo.getCapacidad()
+            );
         }
 
         Estudiante estudiante = estudianteRepository.findById(estudianteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
 
+        // Si el estudiante ya está en otro grupo, quitarlo primero
         if (estudiante.getGrupo() != null) {
-            throw new InvalidOperationException("El estudiante ya pertenece a un grupo");
+            throw new InvalidOperationException(
+                "El estudiante ya está asignado al grupo: " + estudiante.getGrupo().getNombre()
+            );
         }
 
         estudiante.setGrupo(grupo);
         estudianteRepository.save(estudiante);
 
-        return grupo;
+        return grupoRepository.findById(grupoId).orElseThrow();
     }
 }
 

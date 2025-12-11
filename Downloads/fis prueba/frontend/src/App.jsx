@@ -15,6 +15,7 @@ import { ProfesorObservador } from './pages/ProfesorObservador';
 import { AdminAspirantes } from './pages/AdminAspirantes';
 import { AdminCitaciones } from './pages/AdminCitaciones';
 import { AdminGrupos } from './pages/AdminGrupos';
+import { AdminEstudiantes } from './pages/AdminEstudiantes';
 import { AdminUsuarios } from './pages/AdminUsuarios';
 import { AcudienteBoletin } from './pages/AcudienteBoletin';
 import { AcudienteCitaciones } from './pages/AcudienteCitaciones';
@@ -133,6 +134,15 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['ADMIN']}>
                   <AdminGrupos />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/admin/estudiantes"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <AdminEstudiantes />
                 </ProtectedRoute>
               }
             />

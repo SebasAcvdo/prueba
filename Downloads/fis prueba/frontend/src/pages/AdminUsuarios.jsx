@@ -81,13 +81,14 @@ export const AdminUsuarios = () => {
 
   const handleToggleEstado = async (id, estadoActual) => {
     try {
-      await api.patch(`/usuarios/${id}/estado`, null, {
-        params: { estado: !estadoActual }
-      });
+      setError('');
+      setSuccess('');
+      await api.patch(`/usuarios/${id}/estado?estado=${!estadoActual}`);
       setSuccess('Estado actualizado correctamente');
       fetchUsuarios();
     } catch (err) {
-      setError('Error al cambiar estado');
+      setError(err.response?.data?.message || 'Error al cambiar estado');
+      console.error('Error al cambiar estado:', err);
     }
   };
 
