@@ -14,7 +14,7 @@ public record GrupoRequest(
     
     @NotNull(message = "La capacidad es obligatoria")
     @Min(value = 1, message = "La capacidad mínima es 1")
-    @Max(value = 20, message = "La capacidad máxima es 20")
+    @Max(value = 10, message = "La capacidad máxima es 10")
     Integer capacidad,
     
     @NotNull(message = "El ID del profesor es obligatorio")

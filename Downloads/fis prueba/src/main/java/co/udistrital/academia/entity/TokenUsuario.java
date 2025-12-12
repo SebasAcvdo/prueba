@@ -22,6 +22,10 @@ public class TokenUsuario {
     @Column(name = "contrasena_temporal")
     private String contrasenaTemporal;
 
+    @Column(name = "cambiar_pass")
+    @Builder.Default
+    private Boolean cambiarPass = false;
+
     @OneToOne(mappedBy = "tokenUsuario")
     private Usuario usuario;
 }

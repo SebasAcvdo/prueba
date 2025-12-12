@@ -1,7 +1,7 @@
 package co.udistrital.academia.controller;
 
 import co.udistrital.academia.dto.LogroRequest;
-import co.udistrital.academia.dto.LogroResponse;
+import co.udistrital.academia.entity.Logro;
 import co.udistrital.academia.service.LogroService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -28,34 +28,34 @@ public class LogroController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Crear logro", 
                description = "Crea un nuevo logro con categoría PERSONAL_SOCIAL, COGNITIVO_LENGUAJE o AREA_MOTRIZ")
-    public ResponseEntity<LogroResponse> crearLogro(@Valid @RequestBody LogroRequest request) {
-        LogroResponse response = logroService.crearLogro(request);
+    public ResponseEntity<Logro> crearLogro(@Valid @RequestBody LogroRequest request) {
+        Logro response = logroService.crearLogro(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESOR')")
     @Operation(summary = "Listar todos los logros", description = "Obtiene lista completa de logros")
-    public ResponseEntity<List<LogroResponse>> listarLogros() {
-        List<LogroResponse> logros = logroService.listarLogros();
+    public ResponseEntity<List<Logro>> listarLogros() {
+        List<Logro> logros = logroService.listarLogros();
         return ResponseEntity.ok(logros);
     }
 
     @GetMapping("/categoria/{categoria}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESOR')")
     @Operation(summary = "Listar logros por categoría", description = "Filtra logros por categoría específica")
-    public ResponseEntity<List<LogroResponse>> listarPorCategoria(@PathVariable String categoria) {
-        List<LogroResponse> logros = logroService.listarPorCategoria(categoria);
+    public ResponseEntity<List<Logro>> listarPorCategoria(@PathVariable String categoria) {
+        List<Logro> logros = logroService.listarPorCategoria(categoria);
         return ResponseEntity.ok(logros);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Actualizar logro", description = "Actualiza los datos de un logro existente")
-    public ResponseEntity<LogroResponse> actualizarLogro(
+    public ResponseEntity<Logro> actualizarLogro(
             @PathVariable Long id,
             @Valid @RequestBody LogroRequest request) {
-        LogroResponse response = logroService.actualizarLogro(id, request);
+        Logro response = logroService.actualizarLogro(id, request);
         return ResponseEntity.ok(response);
     }
 

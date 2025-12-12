@@ -1,5 +1,6 @@
 package co.udistrital.academia.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -32,10 +33,12 @@ public class Aspirante {
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "aspirante", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Estudiante> estudiantes = new ArrayList<>();
 
+    @JsonIgnore
     @ManyToMany(mappedBy = "aspirantes")
     @Builder.Default
     private List<Citacion> citaciones = new ArrayList<>();

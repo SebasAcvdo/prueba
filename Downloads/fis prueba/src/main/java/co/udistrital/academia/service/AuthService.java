@@ -42,11 +42,10 @@ public class AuthService {
             throw new InvalidOperationException("Usuario deshabilitado");
         }
 
-        // Verificar si es primer login
-        if (usuario.getTokenUsuario() != null && 
-            usuario.getTokenUsuario().getContrasenaTemporal() != null) {
-            throw new InvalidOperationException("Debe cambiar su contraseña temporal en /api/auth/first-login");
-        }
+        // Verificar si debe cambiar contraseña
+        Boolean cambiarPass = usuario.getTokenUsuario() != null && 
+                              usuario.getTokenUsuario().getCambiarPass() != null &&
+                              usuario.getTokenUsuario().getCambiarPass();
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.correo(), request.password())
@@ -55,7 +54,8 @@ public class AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = tokenProvider.generateToken(authentication);
 
-        return new TokenResponse(jwt, tokenProvider.getJwtExpirationInMs(), usuario.getRol().name());
+        return new TokenResponse(jwt, tokenProvider.getJwtExpirationInMs(), 
+            usuario.getId(), usuario.getNombre(), usuario.getCorreo(), usuario.getRol().name(), cambiarPass);
     }
 
     @Transactional
@@ -72,14 +72,33 @@ public class AuthService {
             throw new InvalidOperationException("Contraseña temporal incorrecta");
         }
 
-        // Actualizar password y eliminar token temporal
+        // Actualizar password y limpiar cambiarPass
         usuario.setPassword(passwordEncoder.encode(request.nuevaPassword()));
-        usuario.setTokenUsuario(null);
+        tokenUsuario.setContrasenaTemporal(null);
+        tokenUsuario.setCambiarPass(false);
         usuarioRepository.save(usuario);
 
         // Generar token JWT
-        String jwt = tokenProvider.generateTokenFromUsername(usuario.getCorreo(), usuario.getRol().name());
+        String jwt = tokenProvider.generateTokenFromUsername(usuario.getCorreo(), usuario.getRol().name(), usuario.getId());
 
-        return new TokenResponse(jwt, tokenProvider.getJwtExpirationInMs(), usuario.getRol().name());
+        return new TokenResponse(jwt, tokenProvider.getJwtExpirationInMs(),
+            usuario.getId(), usuario.getNombre(), usuario.getCorreo(), usuario.getRol().name(), false);
+    }
+
+    @Transactional
+    public void resetPassword(String correo, String nuevaPassword) {
+        Usuario usuario = usuarioRepository.findByCorreo(correo)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
+        if (nuevaPassword == null || nuevaPassword.length() < 6) {
+            throw new InvalidOperationException("La contraseña debe tener al menos 6 caracteres");
+        }
+
+        // Actualizar password y limpiar flag cambiarPass
+        usuario.setPassword(passwordEncoder.encode(nuevaPassword));
+        if (usuario.getTokenUsuario() != null) {
+            usuario.getTokenUsuario().setCambiarPass(false);
+        }
+        usuarioRepository.save(usuario);
     }
 }

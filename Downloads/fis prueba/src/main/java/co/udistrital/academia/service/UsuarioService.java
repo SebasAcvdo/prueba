@@ -1,8 +1,7 @@
 package co.udistrital.academia.service;
 
-import co.udistrital.academia.dto.EstadoUsuarioRequest;
+import co.udistrital.academia.dto.CredencialesTemporalesDto;
 import co.udistrital.academia.dto.UsuarioRequest;
-import co.udistrital.academia.dto.UsuarioResponse;
 import co.udistrital.academia.dto.UsuarioUpdateRequest;
 import co.udistrital.academia.entity.TokenUsuario;
 import co.udistrital.academia.entity.Usuario;
@@ -28,13 +27,12 @@ public class UsuarioService {
     private PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
-    public Page<UsuarioResponse> listarUsuarios(Pageable pageable) {
-        return usuarioRepository.findAll(pageable)
-                .map(this::toResponse);
+    public Page<Usuario> listarUsuarios(Pageable pageable) {
+        return usuarioRepository.findAll(pageable);
     }
 
     @Transactional
-    public UsuarioResponse crearUsuario(UsuarioRequest request) {
+    public CredencialesTemporalesDto crearUsuario(UsuarioRequest request) {
         if (usuarioRepository.existsByCorreo(request.correo())) {
             throw new InvalidOperationException("Ya existe un usuario con ese correo");
         }
@@ -58,11 +56,11 @@ public class UsuarioService {
 
         usuario = usuarioRepository.save(usuario);
 
-        return toResponseWithCredentials(usuario, usuarioTemporal, passwordTemporal);
+        return new CredencialesTemporalesDto(usuario.getId(), usuarioTemporal, passwordTemporal);
     }
 
     @Transactional
-    public UsuarioResponse actualizarUsuario(Long id, UsuarioUpdateRequest request) {
+    public Usuario actualizarUsuario(Long id, UsuarioUpdateRequest request) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
@@ -74,41 +72,15 @@ public class UsuarioService {
             usuario.setCorreo(request.correo());
         }
 
-        usuario = usuarioRepository.save(usuario);
-        return toResponse(usuario);
+        return usuarioRepository.save(usuario);
     }
 
     @Transactional
-    public UsuarioResponse cambiarEstado(Long id, Boolean nuevoEstado) {
+    public Usuario cambiarEstado(Long id, Boolean nuevoEstado) {
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         usuario.setEstado(nuevoEstado);
-        usuario = usuarioRepository.save(usuario);
-        return toResponse(usuario);
-    }
-
-    private UsuarioResponse toResponse(Usuario usuario) {
-        return new UsuarioResponse(
-                usuario.getId(),
-                usuario.getNombre(),
-                usuario.getCorreo(),
-                usuario.getRol().name(),
-                usuario.getEstado(),
-                null,
-                null
-        );
-    }
-
-    private UsuarioResponse toResponseWithCredentials(Usuario usuario, String usuarioTemporal, String passwordTemporal) {
-        return new UsuarioResponse(
-                usuario.getId(),
-                usuario.getNombre(),
-                usuario.getCorreo(),
-                usuario.getRol().name(),
-                usuario.getEstado(),
-                usuarioTemporal,
-                passwordTemporal
-        );
+        return usuarioRepository.save(usuario);
     }
 }

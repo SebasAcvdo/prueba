@@ -9,6 +9,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,6 +32,20 @@ public class CalificacionController {
 
     @Autowired
     private ReporteService reporteService;
+
+    @GetMapping("/page")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESOR')")
+    @Operation(summary = "Listar calificaciones paginadas", 
+               description = "Lista calificaciones paginadas con filtros opcionales")
+    public ResponseEntity<Page<CalificacionResponse>> listarCalificacionesPaginadas(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) Long estudianteId,
+            @RequestParam(required = false) Integer periodo) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CalificacionResponse> calificaciones = calificacionService.listarCalificacionesPaginadas(pageable, estudianteId, periodo);
+        return ResponseEntity.ok(calificaciones);
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESOR') or hasRole('ACUDIENTE')")

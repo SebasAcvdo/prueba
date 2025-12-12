@@ -9,7 +9,7 @@ public record CitacionResponse(
     LocalDateTime fecha,
     String motivo,
     String estadoCita,
-    List<String> acudientes,
-    List<String> profesores,
-    List<Long> aspiranteIds
+    List<UsuarioSimpleDTO> acudientes,
+    List<UsuarioSimpleDTO> profesores,
+    List<AspiranteSimpleDTO> aspirantes
 ) {}

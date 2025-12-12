@@ -1,0 +1,50 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.activo {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.inactivo {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.pendiente {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.aprobado {
+  background-color: #d1ecf1;
+  color: #0c5460;
+}
+
+.rechazado {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.en_proceso {
+  background-color: #e7f3ff;
+  color: #004085;
+}
+
+.confirmado {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.sin_confirmar {
+  background-color: #fff3cd;
+  color: #856404;
+}

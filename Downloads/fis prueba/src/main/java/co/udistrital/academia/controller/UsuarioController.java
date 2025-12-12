@@ -1,8 +1,9 @@
 package co.udistrital.academia.controller;
 
+import co.udistrital.academia.dto.CredencialesTemporalesDto;
 import co.udistrital.academia.dto.UsuarioRequest;
-import co.udistrital.academia.dto.UsuarioResponse;
 import co.udistrital.academia.dto.UsuarioUpdateRequest;
+import co.udistrital.academia.entity.Usuario;
 import co.udistrital.academia.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -29,11 +30,11 @@ public class UsuarioController {
     @GetMapping("/page")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "C.U 18 - Listar usuarios paginados", description = "Obtiene lista paginada de usuarios")
-    public ResponseEntity<Page<UsuarioResponse>> listarUsuarios(
+    public ResponseEntity<Page<Usuario>> listarUsuarios(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<UsuarioResponse> usuarios = usuarioService.listarUsuarios(pageable);
+        Page<Usuario> usuarios = usuarioService.listarUsuarios(pageable);
         return ResponseEntity.ok(usuarios);
     }
 
@@ -41,18 +42,18 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "C.U 17 - Crear usuario", 
                description = "Crea un nuevo usuario con credenciales temporales")
-    public ResponseEntity<UsuarioResponse> crearUsuario(@Valid @RequestBody UsuarioRequest request) {
-        UsuarioResponse response = usuarioService.crearUsuario(request);
+    public ResponseEntity<CredencialesTemporalesDto> crearUsuario(@Valid @RequestBody UsuarioRequest request) {
+        CredencialesTemporalesDto response = usuarioService.crearUsuario(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "C.U 17.1 - Actualizar usuario", description = "Actualiza los datos de un usuario")
-    public ResponseEntity<UsuarioResponse> actualizarUsuario(
+    public ResponseEntity<Usuario> actualizarUsuario(
             @PathVariable Long id,
             @Valid @RequestBody UsuarioUpdateRequest request) {
-        UsuarioResponse response = usuarioService.actualizarUsuario(id, request);
+        Usuario response = usuarioService.actualizarUsuario(id, request);
         return ResponseEntity.ok(response);
     }
 
@@ -60,10 +61,10 @@ public class UsuarioController {
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "C.U 20 - Habilitar/Deshabilitar usuario", 
                description = "Cambia el estado activo/inactivo de un usuario")
-    public ResponseEntity<UsuarioResponse> cambiarEstado(
+    public ResponseEntity<Usuario> cambiarEstado(
             @PathVariable Long id,
             @RequestParam Boolean estado) {
-        UsuarioResponse response = usuarioService.cambiarEstado(id, estado);
+        Usuario response = usuarioService.cambiarEstado(id, estado);
         return ResponseEntity.ok(response);
     }
 }

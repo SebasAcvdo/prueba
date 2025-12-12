@@ -12,12 +12,12 @@ import co.udistrital.academia.repository.EstudianteRepository;
 import co.udistrital.academia.repository.GrupoRepository;
 import co.udistrital.academia.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 public class GrupoService {
 
@@ -31,7 +31,7 @@ public class GrupoService {
     private EstudianteRepository estudianteRepository;
 
     @Transactional
-    public GrupoResponse crearGrupo(GrupoRequest request) {
+    public Grupo crearGrupo(GrupoRequest request) {
         Usuario profesor = usuarioRepository.findById(request.profesorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Profesor no encontrado"));
 
@@ -48,11 +48,47 @@ public class GrupoService {
                 .build();
 
         grupo = grupoRepository.save(grupo);
-        return toResponse(grupo);
+        return grupo;
+    }
+
+    public List<GrupoResponse> listarGrupos(Long profesorId) {
+        List<Grupo> grupos;
+        if (profesorId != null) {
+            grupos = grupoRepository.findAll().stream()
+                .filter(g -> g.getProfesor() != null && g.getProfesor().getId().equals(profesorId))
+                .toList();
+        } else {
+            grupos = grupoRepository.findAll();
+        }
+        return grupos.stream().map(this::convertirAGrupoResponse).toList();
+    }
+
+    private GrupoResponse convertirAGrupoResponse(Grupo grupo) {
+        return new GrupoResponse(
+            grupo.getId(),
+            grupo.getNombre(),
+            grupo.getGrado(),
+            grupo.getCapacidad(),
+            grupo.getEstado().name(),
+            grupo.getProfesor() != null ? grupo.getProfesor().getNombre() : null,
+            grupo.getEstudiantes() != null ? grupo.getEstudiantes().size() : 0,
+            grupo.getEstudiantes() != null 
+                ? grupo.getEstudiantes().stream()
+                    .map(e -> new EstudianteSimpleResponse(
+                        e.getId(), 
+                        e.getNombre(), 
+                        e.getApellido(),
+                        e.getGrado() != null ? e.getGrado() : "",
+                        e.getRegCivil() != null ? e.getRegCivil() : "",
+                        e.getEstado() != null ? e.getEstado().name() : ""
+                    ))
+                    .toList()
+                : List.of()
+        );
     }
 
     @Transactional
-    public GrupoResponse confirmarGrupo(Long id) {
+    public Grupo confirmarGrupo(Long id) {
         Grupo grupo = grupoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Grupo no encontrado"));
 
@@ -61,62 +97,111 @@ public class GrupoService {
         }
 
         grupo.setEstado(Grupo.EstadoGrupo.ACTIVO);
-        grupo = grupoRepository.save(grupo);
-        return toResponse(grupo);
+        return grupoRepository.save(grupo);
     }
 
     @Transactional(readOnly = true)
-    public List<GrupoResponse> listarGrupos() {
-        return grupoRepository.findAll().stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+    public List<Grupo> listarGrupos() {
+        return grupoRepository.findAll();
     }
 
     @Transactional(readOnly = true)
-    public GrupoResponse obtenerGrupo(Long id) {
-        Grupo grupo = grupoRepository.findById(id)
+    public Page<Grupo> listarGruposPaginados(Pageable pageable, String estado) {
+        if (estado != null && !estado.isEmpty()) {
+            try {
+                Grupo.EstadoGrupo estadoEnum = Grupo.EstadoGrupo.valueOf(estado.toUpperCase());
+                return grupoRepository.findByEstado(estadoEnum, pageable);
+            } catch (IllegalArgumentException e) {
+                throw new InvalidOperationException("Estado inválido: " + estado);
+            }
+        }
+        return grupoRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Grupo obtenerGrupo(Long id) {
+        return grupoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Grupo no encontrado"));
-        return toResponse(grupo);
     }
 
     @Transactional
-    public GrupoResponse agregarEstudiante(Long grupoId, Long estudianteId) {
+    public void eliminarGrupo(Long id) {
+        Grupo grupo = grupoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Grupo no encontrado"));
+        
+        // Desasignar estudiantes del grupo
+        grupo.getEstudiantes().forEach(estudiante -> {
+            estudiante.setGrupo(null);
+            estudianteRepository.save(estudiante);
+        });
+        
+        // Borrado lógico: cambiar estado a BORRADOR (inactivo)
+        grupo.setEstado(Grupo.EstadoGrupo.BORRADOR);
+        grupoRepository.save(grupo);
+    }
+
+    @Transactional
+    public Grupo asignarEstudiantes(Long grupoId, List<Long> estudianteIds) {
         Grupo grupo = grupoRepository.findById(grupoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Grupo no encontrado"));
 
-        if (grupo.getEstudiantes().size() >= grupo.getCapacidad()) {
-            throw new InvalidOperationException("El grupo ha alcanzado su capacidad máxima de " + grupo.getCapacidad());
+        if (estudianteIds.size() > grupo.getCapacidad()) {
+            throw new InvalidOperationException(
+                "No se pueden asignar " + estudianteIds.size() + 
+                " estudiantes. Capacidad máxima: " + grupo.getCapacidad()
+            );
+        }
+
+        // Desasignar estudiantes actuales que no están en la nueva lista
+        grupo.getEstudiantes().forEach(estudiante -> {
+            if (!estudianteIds.contains(estudiante.getId())) {
+                estudiante.setGrupo(null);
+                estudianteRepository.save(estudiante);
+            }
+        });
+
+        // Asignar nuevos estudiantes
+        for (Long estudianteId : estudianteIds) {
+            Estudiante estudiante = estudianteRepository.findById(estudianteId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con ID: " + estudianteId));
+            
+            estudiante.setGrupo(grupo);
+            estudianteRepository.save(estudiante);
+        }
+
+        return grupoRepository.findById(grupoId).orElseThrow();
+    }
+
+    @Transactional
+    public Grupo agregarEstudiante(Long grupoId, Long estudianteId) {
+        Grupo grupo = grupoRepository.findById(grupoId)
+                .orElseThrow(() -> new ResourceNotFoundException("Grupo no encontrado"));
+
+        // Verificar capacidad
+        long estudiantesActuales = estudianteRepository.findAll().stream()
+                .filter(e -> e.getGrupo() != null && e.getGrupo().getId().equals(grupoId))
+                .count();
+
+        if (estudiantesActuales >= grupo.getCapacidad()) {
+            throw new InvalidOperationException(
+                "El grupo está lleno. Capacidad máxima: " + grupo.getCapacidad()
+            );
         }
 
         Estudiante estudiante = estudianteRepository.findById(estudianteId)
                 .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado"));
 
+        // Si el estudiante ya está en otro grupo, quitarlo primero
         if (estudiante.getGrupo() != null) {
-            throw new InvalidOperationException("El estudiante ya pertenece a un grupo");
+            throw new InvalidOperationException(
+                "El estudiante ya está asignado al grupo: " + estudiante.getGrupo().getNombre()
+            );
         }
 
         estudiante.setGrupo(grupo);
         estudianteRepository.save(estudiante);
 
-        return toResponse(grupo);
-    }
-
-    private GrupoResponse toResponse(Grupo grupo) {
-        List<EstudianteSimpleResponse> estudiantes = grupo.getEstudiantes().stream()
-                .map(e -> new EstudianteSimpleResponse(
-                        e.getId(), e.getNombre(), e.getApellido(), e.getGrado(),
-                        e.getRegCivil(), e.getEstado().name()))
-                .collect(Collectors.toList());
-
-        return new GrupoResponse(
-                grupo.getId(),
-                grupo.getNombre(),
-                grupo.getGrado(),
-                grupo.getCapacidad(),
-                grupo.getEstado().name(),
-                grupo.getProfesor().getNombre(),
-                grupo.getEstudiantes().size(),
-                estudiantes
-        );
+        return grupoRepository.findById(grupoId).orElseThrow();
     }
 }
+

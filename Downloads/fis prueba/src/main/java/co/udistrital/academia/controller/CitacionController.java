@@ -8,6 +8,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -33,12 +36,40 @@ public class CitacionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @GetMapping("/page")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESOR') or hasRole('ACUDIENTE')")
+    @Operation(summary = "Listar citaciones paginadas", 
+               description = "Lista citaciones paginadas con filtros opcionales por tipo y estado")
+    public ResponseEntity<Page<CitacionResponse>> listarCitacionesPaginadas(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) String estado) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<CitacionResponse> citaciones = citacionService.listarCitacionesPaginadas(pageable, tipo, estado);
+        return ResponseEntity.ok(citaciones);
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('PROFESOR') or hasRole('ACUDIENTE')")
-    @Operation(summary = "C.U 2, 4, 5 - Listar citaciones por tipo", 
-               description = "Lista citaciones filtradas por tipo: INDIVIDUAL, GRUPAL o ASPIRANTE")
-    public ResponseEntity<List<CitacionResponse>> listarCitaciones(@RequestParam String tipo) {
-        List<CitacionResponse> citaciones = citacionService.listarPorTipo(tipo);
+    @Operation(summary = "C.U 2, 4, 5 - Listar citaciones", 
+               description = "Lista citaciones filtradas por tipo, profesor o acudiente")
+    public ResponseEntity<List<CitacionResponse>> listarCitaciones(
+            @RequestParam(required = false) String tipo,
+            @RequestParam(required = false) Long profesorId,
+            @RequestParam(required = false) Long acudienteId) {
+        List<CitacionResponse> citaciones = citacionService.listarCitaciones(tipo, profesorId, acudienteId);
         return ResponseEntity.ok(citaciones);
+    }
+
+    @PatchMapping("/{id}/estado")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "C.U - Cambiar estado de citación", 
+               description = "Actualiza el estado de una citación (PENDIENTE, REALIZADA, CANCELADA)")
+    public ResponseEntity<CitacionResponse> cambiarEstado(
+            @PathVariable Long id,
+            @RequestParam String estado) {
+        CitacionResponse response = citacionService.cambiarEstado(id, estado);
+        return ResponseEntity.ok(response);
     }
 }
