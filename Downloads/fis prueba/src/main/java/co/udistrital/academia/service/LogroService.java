@@ -75,8 +75,8 @@ public class LogroService {
         Logro logro = logroRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Logro no encontrado"));
         
-        // Borrado lógico: cambiar estado a INACTIVO
-        logro.setEstado(Logro.EstadoLogro.INACTIVO);
+        // Borrado lógico: cambiar estado a DESACTIVADO
+        logro.setEstado(Logro.EstadoLogro.DESACTIVADO);
         logroRepository.save(logro);
     }
 }
