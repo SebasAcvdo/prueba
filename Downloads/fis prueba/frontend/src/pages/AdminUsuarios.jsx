@@ -83,12 +83,24 @@ export const AdminUsuarios = () => {
     try {
       setError('');
       setSuccess('');
-      await api.patch(`/usuarios/${id}/estado?estado=${!estadoActual}`);
+      console.log('Cambiando estado del usuario', id, 'a', !estadoActual);
+      console.log('Token en localStorage:', localStorage.getItem('token')?.substring(0, 20) + '...');
+      
+      const response = await api.patch(`/usuarios/${id}/estado?estado=${!estadoActual}`);
+      console.log('Respuesta:', response);
+      
       setSuccess('Estado actualizado correctamente');
       fetchUsuarios();
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al cambiar estado');
-      console.error('Error al cambiar estado:', err);
+      console.error('Error completo:', err);
+      console.error('Status:', err.response?.status);
+      console.error('Data:', err.response?.data);
+      
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        setError('No tienes permisos para realizar esta acción. Verifica que tu sesión no haya expirado.');
+      } else {
+        setError(err.response?.data?.message || 'Error al cambiar estado');
+      }
     }
   };
 

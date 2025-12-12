@@ -43,11 +43,8 @@ export const Login = () => {
       
       if (rol === 'ASPIRANTE') {
         navigate('/aspirante');
-      } else if (rol === 'PROFESOR') {
-        navigate('/profesor');
-      } else if (rol === 'ADMIN') {
-        navigate('/admin');
       } else {
+        // Todos los demás roles van al dashboard
         navigate('/dashboard');
       }
     } catch (err) {

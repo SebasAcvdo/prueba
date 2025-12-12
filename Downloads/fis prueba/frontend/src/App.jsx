@@ -122,6 +122,15 @@ function App() {
 
             {/* Rutas Admin */}
             <Route
+              path="/admin"
+              element={
+                <ProtectedRoute allowedRoles={['ADMIN']}>
+                  <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
               path="/admin/usuarios"
               element={
                 <ProtectedRoute allowedRoles={['ADMIN']}>

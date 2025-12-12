@@ -135,7 +135,9 @@ public class GrupoService {
             estudianteRepository.save(estudiante);
         });
         
-        grupoRepository.delete(grupo);
+        // Borrado lógico: cambiar estado a BORRADOR (inactivo)
+        grupo.setEstado(Grupo.EstadoGrupo.BORRADOR);
+        grupoRepository.save(grupo);
     }
 
     @Transactional

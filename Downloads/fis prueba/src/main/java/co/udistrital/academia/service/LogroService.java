@@ -72,9 +72,11 @@ public class LogroService {
 
     @Transactional
     public void eliminarLogro(Long id) {
-        if (!logroRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Logro no encontrado");
-        }
-        logroRepository.deleteById(id);
+        Logro logro = logroRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Logro no encontrado"));
+        
+        // Borrado lógico: cambiar estado a INACTIVO
+        logro.setEstado(Logro.EstadoLogro.INACTIVO);
+        logroRepository.save(logro);
     }
 }
